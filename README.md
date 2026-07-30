@@ -10,19 +10,3 @@ Plain HTML/CSS, no build tools, no frameworks. `index.html` is a one-page overvi
 - `images/` — every photo, logo, and glyph used across the site.
 
 Each standalone page's nav links to the *other* standalone pages (not back to homepage anchors), and each homepage section has a "See more →" link out to its matching standalone page.
-
-## Preview it
-
-Double-click `index.html` — opens directly in your browser, no server needed. Click through the nav and the "see more" links to check the standalone pages too.
-
-## Editing later
-
-- **Text**: open any `.html` file in a text editor and edit the copy directly.
-- **Images**: swap files in `images/` (keep filenames the same, or update the `src=` in the relevant HTML file).
-- **Colors/fonts**: all defined once at the top of `styles.css` under `:root`.
-- **Bigger changes**: paste a file into a Claude.ai chat and describe what you want changed.
-
-## Publishing for free
-
-Same as before — GitHub Pages, Netlify, or Cloudflare Pages all host this for free. Upload every file in this folder (including `images/`) to your repository, replacing what's there now. If you're using GitHub: delete the old files in the repo and upload these in their place, rather than deleting the whole repo — that keeps your GitHub Pages and custom domain settings intact.
-
