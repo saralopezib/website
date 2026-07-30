@@ -5,13 +5,11 @@
 
 :root {
   --bg: #FAF9F5;
-  --bg-page: #F1EFE8;
   --ink: #1A1917;
   --ink-soft: #6E6A5F;
   --line: #E6E2D8;
   --sage: #5A7554;
   --sage-tint: #EDF1EA;
-  --max: 1280px;
 }
 
 * { box-sizing: border-box; }
@@ -19,19 +17,17 @@ html { scroll-behavior: smooth; }
 
 body {
   margin: 0;
-  background: var(--bg-page);
+  background: var(--bg);
   color: var(--ink);
   font-family: 'Karla', Helvetica, Arial, sans-serif;
   font-size: 16.5px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 .sheet {
   background: var(--bg);
-  max-width: var(--max);
-  margin: 0 auto;
-  box-shadow: 0 2px 24px rgba(0,0,0,.06);
 }
 
 .mono {
@@ -111,7 +107,7 @@ nav.main-nav a { color: var(--ink); }
 }
 .practice-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 36px;
   padding-top: 36px;
 }
@@ -122,8 +118,7 @@ nav.main-nav a { color: var(--ink); }
 figure { margin: 0; }
 figure .photo { overflow: hidden; }
 figure .photo img { width: 100%; object-fit: cover; display: block; }
-.work-grid figure .photo img { height: 300px; }
-.practice-grid figure .photo img { height: 220px; }
+.work-grid figure .photo img, .practice-grid figure .photo img { height: 300px; }
 figcaption {
   display: flex;
   justify-content: space-between;
@@ -160,14 +155,6 @@ figcaption .when { color: var(--ink-soft); }
   margin: 0 0 16px;
   max-width: 640px;
 }
-.about-block .credentials {
-  font-size: 14px;
-  color: var(--ink-soft);
-  margin: 20px 0 28px;
-  max-width: 640px;
-}
-.about-block .credentials strong { color: var(--ink); }
-
 .btn {
   display: inline-block;
   background: var(--ink);
@@ -182,34 +169,6 @@ figcaption .when { color: var(--ink-soft); }
 @media (max-width: 700px) {
   .about-block { grid-template-columns: 1fr; }
   .about-block .portrait-round { width: 140px; height: 140px; }
-}
-
-/* ---------- Logos ---------- */
-.logos-block { padding: 88px 64px 0; }
-.logos-block .label {
-  font-size: 12.5px;
-  color: var(--sage);
-  margin: 0 0 24px;
-}
-.logos-row {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 32px;
-  max-width: 1072px;
-  align-items: center;
-}
-.logos-row img {
-  height: 40px;
-  width: auto;
-  max-width: 100%;
-  object-fit: contain;
-  filter: grayscale(1) brightness(0) opacity(.55);
-}
-@media (max-width: 900px) {
-  .logos-row { grid-template-columns: repeat(3, 1fr); row-gap: 24px; }
-}
-@media (max-width: 500px) {
-  .logos-row { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* ---------- Case study list (standalone pages) ---------- */
@@ -255,6 +214,11 @@ figcaption .when { color: var(--ink-soft); }
   .case-item { grid-template-columns: 1fr; }
 }
 
+/* ---------- One-off section padding (see-more / contact wrappers) ---------- */
+.section-tail { padding: 0 64px 64px; }
+.section-lead { padding: 48px 64px 0; }
+#contact { padding: 64px 64px 0; }
+
 /* ---------- Timeline (about page) ---------- */
 .timeline { padding: 56px 64px 0; }
 .tl-item { display: grid; grid-template-columns: 130px 1fr; gap: 24px; padding: 22px 0; border-top: 1px solid var(--line); }
@@ -280,21 +244,30 @@ figcaption .when { color: var(--ink-soft); }
   text-align: center;
   font-size: 15px;
   color: var(--ink-soft);
-  margin: 48px 0 0;
+  margin: 22px 0 0;
 }
 .social-line {
   text-align: center;
   font-size: 15px;
   color: var(--ink);
-  margin: 22px 0 0;
+  margin: 48px 0 0;
 }
 .social-line a { text-decoration: underline; text-decoration-color: var(--line); }
 .social-line a:hover { text-decoration-color: var(--sage); }
 
 @media (max-width: 700px) {
-  .header-row, .hero, .numbered-section, .about-block, .logos-block { padding-left: 24px; padding-right: 24px; }
+  .header-row, .hero, .numbered-section, .about-block,
+  .page-intro, .case-list, .timeline,
+  .section-tail, .section-lead, #contact { padding-left: 24px; padding-right: 24px; }
   .about-block { margin-left: 24px; margin-right: 24px; }
   .hero { padding-left: 24px; padding-right: 24px; grid-template-columns: 1fr; gap: 24px; }
+  .hero-photo img { height: 280px; }
   .glyph-row { gap: 48px; padding: 48px 24px 32px; }
   nav.main-nav { gap: 18px; }
+}
+
+@media (max-width: 480px) {
+  .header-row { padding-left: 16px; padding-right: 16px; }
+  .header-row img.wordmark-img { height: 32px; }
+  nav.main-nav { gap: 12px; font-size: 12px; }
 }
