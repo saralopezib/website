@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&amp;family=Karla:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Oswald:wght@400;500&amp;display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+body { margin: 0; background: #FAF9F5; }
+a { color: inherit; }
+a:hover { color: #5A7554; }
+@keyframes heroWord { from { opacity:0; transform:translateY(.45em); filter:blur(5px); } to { opacity:1; transform:none; filter:none; } }
+@keyframes heroFade { from { opacity:0; } to { opacity:1; } }
+@keyframes heroInk { to { background-size:100% 3px; } }
+@keyframes heroLine { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+</style>
+</helmet>
+
+<div style="background:#FAF9F5;color:#1A1917;font-family:Karla,Helvetica,sans-serif;font-size:16.5px;line-height:1.65;max-width:1280px;margin:0 auto">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:28px 64px;position:{{ navPos }};top:0;z-index:20;background:#FAF9F5">
+    <img src="images/signature.png" alt="Sara Lopez" style="height:42px;width:auto">
+    <nav style="display:flex;gap:30px;font-family:'IBM Plex Mono',monospace;font-size:13.5px;color:#1A1917">
+      <a href="Work.dc.html" style="text-decoration:none">work</a><a href="Services.dc.html" style="text-decoration:none">services</a><a href="About.dc.html" style="text-decoration:none">about</a>
+    </nav>
+  </div>
+  <div style="padding:96px 64px 80px">
+    <h1 style="font-family: Newsreader,Georgia,serif; font-weight: 300; font-size: 74px; line-height: 1.08; letter-spacing: -.015em; margin: 0; max-width: 1140px; opacity: 0; animation: heroLine .6s cubic-bezier(0.2,0,0,1) .1s forwards">A decade <span style="color:#5A7554;background:linear-gradient(#5A7554,#5A7554) no-repeat 0 94%/0% 3px;animation:heroInk .5s cubic-bezier(0.2,0,0,1) .75s forwards">untangling</span> complexity through UX, research and service design.</h1>
+    
+  </div>
+  <div style="display:flex;justify-content:center;gap:140px;align-items:center;padding:0 64px 88px">
+    <img src="uploads/research.png" alt="Research glyph" style="height:72px;width:auto;opacity:0;animation:heroLine .6s cubic-bezier(0.2,0,0,1) .45s forwards">
+    <img src="uploads/design.png" alt="Design glyph" style="height:72px;width:auto;opacity:0;animation:heroLine .6s cubic-bezier(0.2,0,0,1) .58s forwards">
+    <img src="uploads/strategy.png" alt="Strategy glyph" style="height:72px;width:auto;opacity:0;animation:heroLine .6s cubic-bezier(0.2,0,0,1) .71s forwards">
+  </div>
+  <div style="padding:80px 64px 0">
+    <div style="display:flex;align-items:baseline;gap:20px;border-bottom:1px solid #1A1917;padding-bottom:18px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#5A7554">01</span>
+      <h2 style="font-family:Newsreader,serif;font-weight:400;font-size:34px;margin:0">In-house</h2>
+      <a href="Work.dc.html" style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#5A7554;text-decoration:none">/work</a>
+    </div>
+    <div style="padding-top:36px">
+      <figure style="margin:0;min-width:0;overflow:hidden">
+        <div style="aspect-ratio:1036/583"><image-slot id="d-work2" shape="rect" placeholder="Design systems photo"></image-slot></div>
+        <figcaption style="display:flex;justify-content:space-between;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:12.5px"><a href="Work templates.dc.html" style="text-decoration:none">kaluza →</a><span style="color:#6E6A5F">2020–26</span></figcaption>
+      </figure>
+    </div>
+  </div>
+  <div style="padding:80px 64px 0">
+    <div style="display:flex;align-items:baseline;gap:20px;border-bottom:1px solid #1A1917;padding-bottom:18px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#5A7554">02</span>
+      <h2 style="font-family:Newsreader,serif;font-weight:400;font-size:34px;margin:0">Consulting</h2>
+      <a href="Work.dc.html" style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#5A7554;text-decoration:none">/work</a>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:36px;padding-top:36px">
+      <figure style="margin:0;min-width:0;overflow:hidden">
+        <div style="height:300px;background:#FDFDFD"><image-slot id="d-work1" shape="rect" fit="contain" bare="" placeholder="Service design photo"></image-slot></div>
+        <figcaption style="display:flex;justify-content:space-between;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:12.5px"><a href="Work templates.dc.html" style="text-decoration:none">futuregov →</a><span style="color:#6E6A5F">2018–2019</span></figcaption>
+      </figure>
+      <figure style="margin:0;min-width:0;overflow:hidden">
+        <div style="height:300px"><image-slot id="d-consult2" shape="rect" placeholder="Consulting project photo"></image-slot></div>
+        <figcaption style="display:flex;justify-content:space-between;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:12.5px"><a href="Work templates.dc.html" style="text-decoration:none">uscreates →</a><span style="color:#6E6A5F">2018</span></figcaption>
+      </figure>
+    </div>
+  </div>
+  <div style="padding:80px 64px 0">
+    <div style="display:flex;align-items:baseline;gap:20px;border-bottom:1px solid #1A1917;padding-bottom:18px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#5A7554">03</span>
+      <h2 style="font-family:Newsreader,serif;font-weight:400;font-size:34px;margin:0">Freelance</h2>
+      <a href="Work.dc.html" style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#5A7554;text-decoration:none">/work</a>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:36px;padding-top:36px">
+      <figure style="margin:0;min-width:0;overflow:hidden">
+        <div style="height:300px;position:relative"><image-slot id="d-well1" shape="rect" style="filter:brightness(1.08) contrast(1.12) saturate(1.08)" placeholder="Real Insight project photo"></image-slot></div>
+        <figcaption style="display:flex;justify-content:space-between;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:12.5px"><a href="Work templates.dc.html" style="text-decoration:none">real insight →</a><span style="color:#6E6A5F">2017–2018</span></figcaption>
+      </figure>
+      <figure style="margin:0;min-width:0;overflow:hidden">
+        <div style="height:300px"><image-slot id="d-well2" shape="rect" placeholder="Bidean project photo"></image-slot></div>
+        <figcaption style="display:flex;justify-content:space-between;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:12.5px"><a href="Work templates.dc.html" style="text-decoration:none">bidean →</a><span style="color:#6E6A5F">2017–2018</span></figcaption>
+      </figure>
+    </div>
+    <figure style="margin:36px 0 0;display:grid;grid-template-columns:1fr 1.4fr">
+      <div style="background:#E9EDE3;display:flex;flex-direction:column;justify-content:center;padding:48px 56px">
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#5A7554;margin:0 0 14px">/mindnosis</p>
+        <p style="margin:0;color:#3d3a33">A self-initiated practice blending design and wellbeing since 2016. Tools, workshops and tailored sessions, built from empathy and curiosity, now available to book.</p>
+        <a href="Work templates.dc.html" style="align-self:flex-start;margin-top:28px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:#1A1917;text-decoration:none;border-bottom:1px solid #5A7554;padding-bottom:4px">Explore Mindnosis →</a>
+      </div>
+      <div style="height:400px"><image-slot id="d-selfinit" shape="rect" placeholder="Mindnosis — banner image"></image-slot></div>
+    </figure>
+  </div>
+  <div style="margin:88px 64px 0;border-top:1px solid #1A1917;padding-top:48px;display:grid;grid-template-columns:220px 1fr;gap:48px;align-items:center">
+    <img src="images/sara-lopez.jpg" alt="Portrait of Sara Lopez" style="width:220px;height:220px;border-radius:50%;object-fit:cover">
+    <div>
+      <p style="font-family:Newsreader,serif;font-size:24px;line-height:1.5;margin:0 0 24px">I'm Sara, a designer, researcher and facilitator who untangles complex problems, visualises them clearly, and brings people along to solve them.</p>
+      <p style="color:#3d3a33;margin:0 0 16px">For the past six years, I've led UX design and research at Kaluza, a climate tech SaaS platform, working across design systems, journey mapping, information architecture and design management for a growing team.</p>
+      <p style="color:#3d3a33;margin:0 0 24px">Before that, I worked with local authorities, health charities and nonprofits on wicked issues like mental health, homelessness and social care.</p>
+      <a href="#" style="display:inline-block;background:#1A1917;color:#FAF9F5;font-family:'IBM Plex Mono',monospace;font-size:14px;padding:16px 34px;text-decoration:none">let's talk →</a>
+    </div>
+  </div>
+  <div style="margin-top:88px;padding:0 64px 56px">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#5A7554;margin:0 0 28px">who i've worked with</div>
+    <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:32px;max-width:1072px">
+      <div style="height:40px"><image-slot id="d-logo1" shape="rect" fit="contain" bare="" style="filter:brightness(0) drop-shadow(0 0 0 #1A1917)" placeholder="logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo2" shape="rect" fit="contain" bare="" style="filter:brightness(0) opacity(.4)" placeholder="logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo3" shape="rect" fit="contain" bare="" style="filter:brightness(0) opacity(.4)" placeholder="logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo4" shape="rect" fit="contain" bare="" style="filter:brightness(0) opacity(.4)" placeholder="logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo5" shape="rect" fit="contain" bare="" style="filter:brightness(0) opacity(.4)" placeholder="logo"></image-slot></div>
+      <div style="height:54px;align-self:center"><image-slot id="d-logo-wide6" shape="rect" fit="contain" bare="" style="filter:grayscale(1) opacity(.6)" placeholder="logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo7" src="uploads/bidean.png" shape="rect" fit="contain" bare="" style="filter:brightness(0) opacity(.4)" placeholder="logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo8" shape="rect" fit="contain" bare="" style="filter:grayscale(1) opacity(.6)" placeholder="logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo10" shape="rect" fit="contain" bare="" style="filter:brightness(0) opacity(.4)" placeholder="logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo9" shape="rect" fit="contain" bare="" style="filter:brightness(0) opacity(.4)" placeholder="logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo11" shape="rect" fit="contain" bare="" style="filter:grayscale(1) opacity(.6)" placeholder="logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo14" shape="rect" fit="contain" bare="" style="filter:opacity(.7)" placeholder="logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo13" shape="rect" fit="contain" bare="" style="filter:brightness(0) opacity(.4)" placeholder="logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo-wide4" shape="rect" fit="contain" bare="" style="filter:grayscale(1) opacity(.6)" placeholder="logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo6" src="uploads/nsun.png" shape="rect" fit="contain" bare="" style="filter:brightness(0) opacity(.4)" placeholder="logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo16" shape="rect" fit="contain" bare="" style="filter:brightness(0) opacity(.4)" placeholder="logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo17" shape="rect" fit="contain" bare="" style="filter:brightness(0) opacity(.4)" placeholder="logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo18" shape="rect" fit="contain" bare="" style="filter:brightness(0) opacity(.4)" placeholder="logo"></image-slot></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:32px;max-width:1072px;margin-top:32px">
+      <div style="height:40px"><image-slot id="d-logo-wide1" shape="rect" fit="contain" bare="" placeholder="wide logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo-wide2" shape="rect" fit="contain" bare="" style="filter:opacity(.7)" placeholder="wide logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo-wide3" shape="rect" fit="contain" bare="" style="filter:opacity(.7)" placeholder="wide logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo15" shape="rect" fit="contain" bare="" placeholder="wide logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo-wide5" shape="rect" fit="contain" bare="" style="filter:opacity(.7)" placeholder="wide logo"></image-slot></div>
+      <div style="height:40px"><image-slot id="d-logo12" shape="rect" fit="contain" bare="" style="filter:brightness(0) opacity(.4)" placeholder="wide logo"></image-slot></div>
+    </div>
+    <div style="border-top:1px solid #E6E2D8;margin:72px -64px 0"></div>
+    <div id="site-footer" style="display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:48px;align-items:start;padding-top:56px">
+      <div>
+        <img src="images/signature.png" alt="Sara Lopez" style="height:36px;width:auto;display:block">
+        <p style="margin:16px 0 0;color:#6E6A5F;max-width:320px">Designer, researcher and facilitator untangling complex problems.</p>
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#6E6A5F;margin:18px 0 0">Bristol, UK · GMT</p>
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#5A7554;margin:8px 0 0">open to consulting and workshops</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:13px;padding-top:52px">
+        <span style="font-size:12.5px;color:#5A7554">/view</span>
+        <a href="Work.dc.html" style="text-decoration:none">work</a>
+        <a href="Services.dc.html" style="text-decoration:none">services</a>
+        <a href="About.dc.html" style="text-decoration:none">about</a>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:13px;padding-top:52px">
+        <span style="font-size:12.5px;color:#5A7554">/contact</span>
+        <a href="#" style="text-decoration:none">LinkedIn</a>
+        <a href="#" style="text-decoration:none">Email</a>
+        <a href="https://github.com/saralopezib" style="text-decoration:none">GitHub</a>
+      </div>
+    </div>
+    <p style="font-size:14px;color:#8b8880;margin:64px 0 0">© 2026 Sara López Ibáñez</p>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+
+class Component extends DCLogic {
+  state = { footerVisible: false };
+  componentDidMount() {
+    const f = document.getElementById('site-footer');
+    if (f && 'IntersectionObserver' in window) {
+      this._io = new IntersectionObserver(es => this.setState({ footerVisible: es[0].isIntersecting }));
+      this._io.observe(f);
+    }
+  }
+  componentWillUnmount() { if (this._io) this._io.disconnect(); }
+  renderVals() { return { navPos: this.state.footerVisible ? 'static' : 'sticky' }; }
+}</script>
+</body>
+</html>

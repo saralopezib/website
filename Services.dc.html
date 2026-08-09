@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&amp;family=Karla:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+body { margin: 0; background: #FAF9F5; }
+a { color: inherit; }
+a:hover { color: #5A7554; }
+</style>
+</helmet>
+
+<div style="background:#FAF9F5;color:#1A1917;font-family:Karla,Helvetica,sans-serif;font-size:16.5px;line-height:1.65;max-width:1280px;margin:0 auto">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:28px 64px;position:{{ navPos }};top:0;z-index:20;background:#FAF9F5">
+    <a href="Home.dc.html" style="display:block"><img src="images/signature.png" alt="Sara Lopez" style="height:42px;width:auto"></a>
+    <nav style="display:flex;gap:30px;font-family:'IBM Plex Mono',monospace;font-size:13.5px;color:#1A1917">
+      <a href="Work.dc.html" style="text-decoration:none">work</a><a href="Services.dc.html" style="text-decoration:none;border-bottom:1px solid #5A7554;padding-bottom:3px">services</a><a href="About.dc.html" style="text-decoration:none">about</a>
+    </nav>
+  </div>
+  <div style="padding:72px 64px 88px">
+    <p style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#5A7554;margin:0 0 18px">/services</p>
+    <h1 style="font-family:Newsreader,Georgia,serif;font-weight:300;font-size:40px;line-height:1.3;letter-spacing:-.01em;margin:0;max-width:980px">I help teams untangle complex problems, whether that's a product that's grown too complex, a service no one can quite explain, or a team that needs a clearer way of working together.</h1>
+  </div>
+  <div style="padding:0 64px 88px">
+    <div style="display:flex;align-items:baseline;gap:20px;border-bottom:1px solid #1A1917;padding-bottom:18px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#5A7554">01</span>
+      <h2 style="font-family:Newsreader,serif;font-weight:400;font-size:34px;margin:0">What I do</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:28px;padding-top:44px">
+      <div style="background:#EDE9DD;padding:44px 40px">
+        <img src="uploads/strategy.png" alt="Strategy glyph" style="height:56px;width:auto;display:block;margin:0 0 26px">
+        <h3 style="font-family:Newsreader,serif;font-weight:400;font-size:24px;margin:0 0 12px">User experience and product design</h3>
+        <p style="margin:0;color:#3d3a33">Research, wireframing and prototyping, built on over a decade of craft and now extended with AI enabled workflows.</p>
+      </div>
+      <div style="background:#E9EDE3;padding:44px 40px">
+        <img src="uploads/research.png" alt="Research glyph" style="height:56px;width:auto;display:block;margin:0 0 26px">
+        <h3 style="font-family:Newsreader,serif;font-weight:400;font-size:24px;margin:0 0 12px">Service design and research</h3>
+        <p style="margin:0;color:#3d3a33">Systems thinking, service mapping and journey management, across both B2B platforms and services built for consumers.</p>
+      </div>
+      <div style="background:#EAE4DC;padding:44px 40px">
+        <img src="uploads/design.png" alt="Design glyph" style="height:56px;width:auto;display:block;margin:0 0 26px">
+        <h3 style="font-family:Newsreader,serif;font-weight:400;font-size:24px;margin:0 0 12px">Design leadership and facilitation</h3>
+        <p style="margin:0;color:#3d3a33">Workshops, design sprints and cross-functional team alignment, from early discovery through to shipped decisions.</p>
+      </div>
+    </div>
+  </div>
+  <div style="padding:0 64px 88px">
+    <div style="display:flex;align-items:baseline;gap:20px;border-bottom:1px solid #1A1917;padding-bottom:18px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#5A7554">02</span>
+      <h2 style="font-family:Newsreader,serif;font-weight:400;font-size:34px;margin:0">How we could work together</h2>
+    </div>
+    <div>
+      <div style="display:grid;grid-template-columns:280px 1fr;gap:24px;align-items:baseline;padding:26px 0;border-bottom:1px solid #E6E2D8">
+        <span style="font-family:Newsreader,serif;font-size:22px">Project-based</span>
+        <span style="color:#3d3a33">A defined piece of work with a clear scope and end point.</span>
+      </div>
+      <div style="display:grid;grid-template-columns:280px 1fr;gap:24px;align-items:baseline;padding:26px 0;border-bottom:1px solid #E6E2D8">
+        <span style="font-family:Newsreader,serif;font-size:22px">Embedded / fractional</span>
+        <span style="color:#3d3a33">Ongoing support, part of your team on a regular cadence.</span>
+      </div>
+      <div style="display:grid;grid-template-columns:280px 1fr;gap:24px;align-items:baseline;padding:26px 0;border-bottom:1px solid #E6E2D8">
+        <span style="font-family:Newsreader,serif;font-size:22px">Workshops and facilitation</span>
+        <span style="color:#3d3a33">A single session to unblock a specific decision or align a group.</span>
+      </div>
+      <div style="display:grid;grid-template-columns:280px 1fr;gap:24px;align-items:baseline;padding:26px 0">
+        <span style="font-family:Newsreader,serif;font-size:22px">Advisory</span>
+        <span style="color:#3d3a33">A review of existing work, design systems, or ways of working.</span>
+      </div>
+    </div>
+  </div>
+  <div style="padding:0 64px 88px;text-align:center">
+    <p style="font-family:Newsreader,serif;font-size:26px;margin:0 0 26px">Have a problem worth untangling?</p>
+    <a href="#" style="display:inline-block;background:#1A1917;color:#FAF9F5;font-family:'IBM Plex Mono',monospace;font-size:14px;padding:16px 34px;text-decoration:none">let's talk →</a>
+  </div>
+  <div style="padding:0 64px 88px">
+    <div style="background:#E9EDE3;padding:64px 56px">
+      <p style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#5A7554;margin:0 0 16px">/mindnosis</p>
+      <h2 style="font-family:Newsreader,serif;font-weight:400;font-size:32px;margin:0 0 18px;max-width:720px">Design sessions, workshops and artefacts</h2>
+      <p style="margin:0;color:#3d3a33;max-width:760px">Hands-on, design-led workshops tailored to teams, individuals and a variety of settings. Combining evolved elements from my previous work experience and self-directed practice to give people a simple, non-clinical way to check in on how they're doing or facilitate difficult conversations.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px;margin-top:48px">
+        <div style="border-top:1px solid #1A1917;padding-top:18px">
+          <h3 style="font-family:Newsreader,serif;font-weight:400;font-size:22px;margin:0 0 10px">Single session</h3>
+          <p style="margin:0;color:#3d3a33">One 90-minute workshop for a single team, department, or group.</p>
+        </div>
+        <div style="border-top:1px solid #1A1917;padding-top:18px">
+          <h3 style="font-family:Newsreader,serif;font-weight:400;font-size:22px;margin:0 0 10px">Series</h3>
+          <p style="margin:0;color:#3d3a33">3–4 sessions across a quarter, building on themes raised in the previous one.</p>
+        </div>
+        <div style="border-top:1px solid #1A1917;padding-top:18px">
+          <h3 style="font-family:Newsreader,serif;font-weight:400;font-size:22px;margin:0 0 10px">Train-the-trainer</h3>
+          <p style="margin:0;color:#3d3a33">Equip your own facilitators to run the activity themselves.</p>
+        </div>
+      </div>
+      <p style="margin:44px 0 0;color:#3d3a33;max-width:760px;font-size:15.5px">Every session starts with a short call to tailor content to your context, and ends with a light digital follow-up tool participants can return to individually.</p>
+      <a href="Work templates.dc.html" style="display:inline-block;margin-top:28px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:#1A1917;text-decoration:none;border-bottom:1px solid #5A7554;padding-bottom:4px">Explore Mindnosis →</a>
+      <div style="height:380px;margin-top:44px"><image-slot id="d-serv-mind" shape="rect" placeholder="Mindnosis — workshop photo"></image-slot></div>
+    </div>
+  </div>
+  <div style="padding:0 64px 56px">
+    <div style="border-top:1px solid #E6E2D8;margin:0 -64px"></div>
+    <div id="site-footer" style="display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:48px;align-items:start;padding-top:56px">
+      <div>
+        <img src="images/signature.png" alt="Sara Lopez" style="height:36px;width:auto;display:block">
+        <p style="margin:16px 0 0;color:#6E6A5F;max-width:320px">Designer, researcher and facilitator untangling complex problems.</p>
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#6E6A5F;margin:18px 0 0">Bristol, UK · GMT</p>
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#5A7554;margin:8px 0 0">open to consulting and workshops</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:13px;padding-top:52px">
+        <span style="font-size:12.5px;color:#5A7554">/view</span>
+        <a href="Work.dc.html" style="text-decoration:none">work</a>
+        <a href="Services.dc.html" style="text-decoration:none">services</a>
+        <a href="About.dc.html" style="text-decoration:none">about</a>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-family:'IBM Plex Mono',monospace;font-size:13px;padding-top:52px">
+        <span style="font-size:12.5px;color:#5A7554">/contact</span>
+        <a href="#" style="text-decoration:none">LinkedIn</a>
+        <a href="#" style="text-decoration:none">Email</a>
+        <a href="https://github.com/saralopezib" style="text-decoration:none">GitHub</a>
+      </div>
+    </div>
+    <p style="font-size:14px;color:#8b8880;margin:64px 0 0">© 2026 Sara López Ibáñez</p>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { footerVisible: false };
+  componentDidMount() {
+    const f = document.getElementById('site-footer');
+    if (f && 'IntersectionObserver' in window) {
+      this._io = new IntersectionObserver(es => this.setState({ footerVisible: es[0].isIntersecting }));
+      this._io.observe(f);
+    }
+  }
+  componentWillUnmount() { if (this._io) this._io.disconnect(); }
+  renderVals() { return { navPos: this.state.footerVisible ? 'static' : 'sticky' }; }
+}
+</script>
+</body>
+</html>
