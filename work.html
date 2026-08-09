@@ -1,89 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Work — Sara Lopez</title>
-<meta name="description" content="Product and UX/UI design, user research and service design work across technology, non profits and the public sector.">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work — Sara López Ibáñez</title>
+<meta name="description" content="Product and UX/UI design, user research and service design applied across technology, non profits and the public sector.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&family=Karla:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<div class="wrap">
 
-<div class="sheet">
-
-  <header class="site-header">
-    <div class="header-row">
-      <a href="index.html"><img src="images/signature.png" alt="Sara Lopez" class="wordmark-img"></a>
-      <nav class="main-nav mono">
-        <a href="work.html" style="border-bottom:1px solid var(--ink)">work</a>
-        <a href="practice.html">practice</a>
-        <a href="about.html">about</a>
-      </nav>
-    </div>
+  <header class="site-nav">
+    <a href="index.html" style="display:block"><img src="images/signature.png" alt="Sara Lopez" class="signature"></a>
+    <nav>
+      <a href="work.html" class="current">work</a>
+      <a href="services.html">services</a>
+      <a href="about.html">about</a>
+    </nav>
   </header>
 
-  <section class="page-intro">
-    <span class="num mono" style="color:var(--sage);font-size:13px;">/work</span>
-    <h1>Design for complex systems</h1>
-    <p>Product and UX/UI design, user research and service design - applied across technology, non profits and the public sector.</p>
+  <section class="work-intro">
+    <p class="label mono">/work</p>
+    <h1>Product and UX/UI design, user research and service design applied across technology, non profits and the public sector.</h1>
   </section>
 
-  <div class="case-list">
-
-    <div class="case-item">
-      <div class="photo"><img src="images/work-kaluza.jpg" alt="Kaluza strategy sketchnote"></div>
-      <div>
-        <span class="num mono">01</span>
-        <span class="when mono">2020–2026 · Kaluza</span>
-        <h3>In-house product design</h3>
-        <p>Leading design and research, within a UX team, in a growing global b2b SaaS climate tech platform business. Working cross functionally with product and tech leads, to shape user-friendly, insight and data driven user experiences.</p>
-      </div>
+  <div id="work-index">
+    <div>
+      <a href="case-study.html" class="work-row" data-work-row="0" data-summary="Starting as a UX designer working my way up to a design leader, managing design teams work, contributing to design systems, governance, and line management.">
+        <span class="row-head">
+          <span class="row-num">01</span>
+          <span class="row-name">kaluza</span>
+          <span class="row-years">2020–26</span>
+        </span>
+        <span class="row-thumb"><span class="img-placeholder">kaluza — case study coming soon</span></span>
+      </a>
+      <a href="case-study.html" class="work-row" data-work-row="1" data-summary="Service design and user research, embedded within local authority teams to improve adult social care and voluntary sector services.">
+        <span class="row-head">
+          <span class="row-num">02</span>
+          <span class="row-name">futuregov</span>
+          <span class="row-years">2018–2019</span>
+        </span>
+        <span class="row-thumb"><span class="img-placeholder">futuregov — case study coming soon</span></span>
+      </a>
+      <a href="case-study.html" class="work-row" data-work-row="2" data-summary="Place-based initiatives, ethnographic research and service design for local authorities tackling homelessness.">
+        <span class="row-head">
+          <span class="row-num">03</span>
+          <span class="row-name">uscreates</span>
+          <span class="row-years">2018</span>
+        </span>
+        <span class="row-thumb"><span class="img-placeholder">uscreates — case study coming soon</span></span>
+      </a>
+      <a href="case-study.html" class="work-row" data-work-row="3" data-summary="Creative facilitation and participatory workshops to involve service users in the commissioning and delivery of their mental health services.">
+        <span class="row-head">
+          <span class="row-num">04</span>
+          <span class="row-name">real insight</span>
+          <span class="row-years">2017–2018</span>
+        </span>
+        <span class="row-thumb"><span class="img-placeholder">real insight — case study coming soon</span></span>
+      </a>
+      <a href="case-study.html" class="work-row last" data-work-row="4" data-summary="Reimagining services and spaces, co-designing practical improvements to hospital environments alongside service users.">
+        <span class="row-head">
+          <span class="row-num">05</span>
+          <span class="row-name">bidean</span>
+          <span class="row-years">2017–2018</span>
+        </span>
+        <span class="row-thumb"><span class="img-placeholder">bidean — case study coming soon</span></span>
+      </a>
     </div>
 
-    <div class="case-item">
-      <div class="photo"><img src="images/work-service-design.jpg" alt="Service design mapping session"></div>
-      <div>
-        <span class="num mono">02</span>
-        <span class="when mono">2018–2020 · Torchbox &amp; TPX Impact</span>
-        <h3>Design consultancy</h3>
-        <p>Service design and research programmes for central government, local authorities and charities tackling homelessness and adult social care, working alongside product directors and delivery managers.</p>
-      </div>
-    </div>
-
-    <div class="case-item">
-      <div class="photo"><img src="images/work-freelance.png" alt="Colour-coded paper cubes representing different care costs and services"></div>
-      <div>
-        <span class="num mono">03</span>
-        <span class="when mono">2016–2018 · Non profits</span>
-        <h3>Freelance contracts</h3>
-        <p>Consultancy work, creative facilitation, co-design projects, participatory workshops, guest lectures, design strategy, graphic design and illustration.</p>
-      </div>
-    </div>
-
+    <a id="work-cover" href="case-study.html">
+      <span class="cover-slide active" data-cover-slide="0"><span class="img-placeholder">kaluza — case study coming soon</span></span>
+      <span class="cover-slide" data-cover-slide="1"><span class="img-placeholder">futuregov — case study coming soon</span></span>
+      <span class="cover-slide" data-cover-slide="2"><span class="img-placeholder">uscreates — case study coming soon</span></span>
+      <span class="cover-slide" data-cover-slide="3"><span class="img-placeholder">real insight — case study coming soon</span></span>
+      <span class="cover-slide" data-cover-slide="4"><span class="img-placeholder">bidean — case study coming soon</span></span>
+      <span class="cover-summary" data-cover-summary>Starting as a UX designer working my way up to a design leader, managing design teams work, contributing to design systems, governance, and line management.</span>
+    </a>
   </div>
 
-  <section class="section-tail">
-    <div class="see-more mono"><a href="practice.html">See practice →</a></div>
-  </section>
+  <div style="padding:0 64px">
+    <figure class="mindnosis-banner" style="margin-top:72px">
+      <div class="panel">
+        <p class="label-sage">/mindnosis</p>
+        <p class="copy">A self-initiated practice blending design and wellbeing since 2016. Tools, workshops and tailored sessions, built from empathy and curiosity, now available to book.</p>
+        <a href="services.html#mindnosis" class="link-underline" style="align-self:flex-start;margin-top:28px">Explore Mindnosis →</a>
+      </div>
+      <div class="photo">
+        <img src="images/mindnosis-kit.webp" alt="Mindnosis kit, opened to show its tools and activity cards">
+      </div>
+    </figure>
+  </div>
 
-  <footer class="site-footer">
-    <div class="glyph-row">
-      <img src="images/icon-research.png" alt="Research glyph">
-      <img src="images/icon-design.png" alt="Design glyph">
-      <img src="images/icon-strategy.png" alt="Strategy glyph">
-    </div>
-    <p class="social-line">
-      <a href="mailto:saralopezib@gmail.com">Email</a> ·
-      <a href="https://www.linkedin.com/in/saralopezib/" target="_blank" rel="noopener">LinkedIn</a> ·
-      <a href="https://www.instagram.com/saralopezib" target="_blank" rel="noopener">Instagram</a>
-    </p>
-    <p class="copyright">Copyright © 2026 Sara López Ibáñez.<br>All rights reserved</p>
-  </footer>
+  <div style="padding:0 64px 56px;margin-top:88px">
+    <div class="site-footer-rule" style="margin:0 -64px"></div>
+    <footer id="site-footer" class="site-footer">
+      <div class="col-brand">
+        <img src="images/signature.png" alt="Sara Lopez">
+        <p>Designer, researcher and facilitator untangling complex problems.</p>
+        <p class="loc">Bristol, UK · GMT</p>
+        <p class="avail">open to consulting and workshops</p>
+      </div>
+      <div class="col-links">
+        <span class="head">/view</span>
+        <a href="work.html">work</a>
+        <a href="services.html">services</a>
+        <a href="about.html">about</a>
+      </div>
+      <div class="col-links">
+        <span class="head">/contact</span>
+        <a href="#">LinkedIn</a>
+        <a href="#">Email</a>
+        <a href="https://github.com/saralopezib">GitHub</a>
+      </div>
+    </footer>
+    <p class="copyright">© 2026 Sara López Ibáñez</p>
+  </div>
 
 </div>
-
+<script src="script.js"></script>
 </body>
 </html>
