@@ -1,4 +1,4 @@
-/* Sara López Ibáñez — portfolio site
+/* Sara Lopez · portfolio site
    Design tokens + shared layout. See README.md for handoff notes. */
 
 :root {
@@ -48,6 +48,8 @@ img { max-width: 100%; display: block; }
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 24px;
   padding: 28px 64px;
   position: sticky;
   top: 0;
@@ -145,6 +147,12 @@ img { max-width: 100%; display: block; }
 
 .mindnosis-banner .photo { height: 400px; overflow: hidden; }
 .mindnosis-banner .photo img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Standalone-page wrappers for sections that sit outside a semantic
+   section element (mindnosis banner / footer on work, services, about). */
+.mindnosis-wrap { padding: 0 64px; }
+.footer-wrap { padding: 0 64px 56px; }
+.rule-flush { margin: 0 -64px; }
 
 /* ---------- Footer ---------- */
 .site-footer-rule {
@@ -315,6 +323,7 @@ figcaption.cap .yr { color: var(--muted); }
 .logo-cell { height: 40px; display: flex; align-items: center; }
 .logo-cell.tall { height: 54px; align-self: center; }
 .logo-cell img { width: 100%; height: 100%; object-fit: contain; object-position: left center; }
+.logo-cell.badge img { object-position: center; }
 
 .f-dark   { filter: brightness(0) opacity(.4); }
 .f-grey   { filter: grayscale(1) opacity(.6); }
@@ -455,7 +464,7 @@ figcaption.cap .yr { color: var(--muted); }
   gap: 64px;
   align-items: start;
 }
-.about-intro .about-portrait { width: 280px; height: 560px; object-fit: cover; }
+.about-intro .about-portrait { width: 280px; height: 560px; object-fit: cover; object-position: 85% center; }
 .about-intro h1 {
   font-family: Newsreader, Georgia, serif;
   font-weight: 300;
@@ -547,6 +556,8 @@ figcaption.cap .yr { color: var(--muted); }
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 24px;
   padding: 28px 64px;
   border-bottom: 1px solid var(--hairline);
 }
@@ -622,8 +633,8 @@ figcaption.cap .yr { color: var(--muted); }
   .hero h1 { font-size: 48px; }
   .work-grid-2, .cards-grid, .mindnosis-cols, .cs-metarow, .in-public-grid, .logo-grid { grid-template-columns: 1fr 1fr; }
   .about-intro, .mindnosis-banner, .about-teaser { grid-template-columns: 1fr; }
-  .about-intro .about-portrait, .about-teaser .portrait { width: 160px; height: 160px; }
-  .about-teaser .portrait { border-radius: 50%; }
+  .about-intro .about-portrait { width: 100%; height: auto; aspect-ratio: 4/5; object-position: center; }
+  .about-teaser .portrait { width: 160px; height: 160px; border-radius: 50%; }
   .site-footer { grid-template-columns: 1fr; gap: 32px; }
   .site-footer .col-links { padding-top: 0; }
 }
@@ -632,17 +643,42 @@ figcaption.cap .yr { color: var(--muted); }
   .site-nav, .hero, .hero-glyphs, .work-section, .work-intro, .services-intro,
   #work-index, .services-cards, .model-rows, .cta-center, .mindnosis-panel,
   .about-intro, .timeline, .in-public, .logo-wall, .cs-meta-label, .cs-title,
-  .cs-metarow, .cs-chapter, .cs-footer-nav { padding-left: 20px; padding-right: 20px; }
-  .site-footer-rule { margin-left: -20px; margin-right: -20px; }
+  .cs-metarow, .cs-chapter, .cs-pair, .cs-footer-nav,
+  .mindnosis-wrap, .footer-wrap { padding-left: 20px; padding-right: 20px; }
+  .site-footer-rule, .rule-flush { margin-left: -20px; margin-right: -20px; }
   .site-nav .signature, .cs-nav .signature { height: 28px; }
   .site-nav nav, .cs-nav-links { gap: 12px; font-size: 11px; }
   .cs-nav { padding-left: 20px; padding-right: 20px; }
-  .hero h1 { font-size: 36px; }
-  .work-grid-2, .cards-grid, .mindnosis-cols, .cs-metarow, .in-public-grid, .logo-grid, .cs-pair { grid-template-columns: 1fr; }
-  .hero-glyphs { gap: 48px; flex-wrap: wrap; }
+  .work-grid-2, .cards-grid, .mindnosis-cols, .cs-metarow, .in-public-grid, .cs-pair { grid-template-columns: 1fr; }
   .about-teaser { grid-template-columns: 1fr; text-align: left; }
   .model-row, .timeline-row { grid-template-columns: 1fr; gap: 8px; }
   .cs-metarow { grid-template-columns: 1fr 1fr; }
-  .cs-outcomes { grid-template-columns: 1fr; gap: 20px; margin-left: 20px; margin-right: 20px; }
-  .about-teaser { margin-left: 20px; margin-right: 20px; }
+
+  /* tighter vertical rhythm: desktop's 64-96px paddings/margins read as dead
+     space stacked on a phone-height screen, so scale them down here. */
+  .hero { padding: 48px 20px 40px; }
+  .hero h1 { font-size: 36px; }
+  .hero-glyphs { padding: 0 20px 48px; gap: 40px; flex-wrap: wrap; }
+  .work-section { padding: 48px 20px 0; }
+  .work-intro, .services-intro { padding: 40px 20px; }
+  .services-cards, .model-rows, .cta-center, .mindnosis-panel { padding-bottom: 48px; }
+  .mindnosis-panel .inner { padding: 32px 20px; }
+  .mindnosis-banner .panel { padding: 32px 20px; }
+  .about-intro { padding: 40px 20px 48px; }
+  .timeline, .in-public { padding-bottom: 48px; }
+  .about-teaser { margin: 48px 20px 0; padding-top: 32px; }
+  .logo-wall { margin-top: 48px; }
+  .logo-grid { grid-template-columns: repeat(3, minmax(0,1fr)); gap: 20px; }
+  .site-footer-rule { margin-top: 48px; }
+  .site-footer { padding-top: 40px; }
+  .copyright { margin-top: 40px; }
+
+  .cs-outcomes { grid-template-columns: 1fr; gap: 20px; margin: 48px 20px 0; }
+  .cs-hero { height: 320px; }
+  .cs-meta-label { padding-top: 40px; }
+  .cs-chapter { padding-top: 48px; }
+  .cs-pair { padding-top: 32px; }
+  .cs-footer-nav { padding-top: 40px; padding-bottom: 40px; }
+
+  .about-teaser .portrait { width: 100px; height: 100px; }
 }
