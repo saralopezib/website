@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&family=Karla:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+body { margin: 0; background: #FAF9F5; }
+a { color: inherit; }
+a:hover { color: #5A7554; }
+</style>
+</helmet>
+
+<div style="background:#FAF9F5;color:#1A1917;font-family:Karla,Helvetica,sans-serif;font-size:16.5px;line-height:1.65;max-width:1280px;margin:0 auto">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:28px 64px;border-bottom:1px solid #E6E2D8">
+    <img src="images/signature.png" alt="Sara Lopez" style="height:42px;width:auto">
+    <nav style="display:flex;gap:30px;font-family:'IBM Plex Mono',monospace;font-size:13.5px"><a href="Home.dc.html" style="text-decoration:none">work</a><a href="Home.dc.html" style="text-decoration:none">practice</a><a href="Home.dc.html" style="text-decoration:none">about</a></nav>
+  </div>
+  <div style="padding:72px 64px 48px">
+    <p style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#5A7554;margin:0 0 22px">/work · designing for tech</p>
+    <h1 style="font-family:Newsreader,Georgia,serif;font-weight:300;font-size:54px;line-height:1.12;letter-spacing:-.01em;margin:0;max-width:900px">A design system that let five product teams ship as one</h1>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:32px;padding:0 64px 48px">
+    <div><p style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5A7554;margin:0 0 8px">role</p><p style="margin:0;font-size:15.5px">Lead designer</p></div>
+    <div><p style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5A7554;margin:0 0 8px">organisation</p><p style="margin:0;font-size:15.5px">Kaluza</p></div>
+    <div><p style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5A7554;margin:0 0 8px">timeline</p><p style="margin:0;font-size:15.5px">2023 — 2025</p></div>
+    <div><p style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#5A7554;margin:0 0 8px">team</p><p style="margin:0;font-size:15.5px">2 designers · 3 engineers</p></div>
+  </div>
+  <div style="height:560px"><image-slot id="bl-hero" shape="rect" placeholder="Opening scene — the team at the wall"></image-slot></div>
+  <p style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#6E6A5F;margin:14px 64px 0">where it started — five teams, one product, no shared language</p>
+  <div style="padding:88px 64px 0">
+    <div style="display:flex;align-items:baseline;gap:20px;border-bottom:1px solid #1A1917;padding-bottom:16px"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#5A7554">01</span><h2 style="font-family:Newsreader,serif;font-weight:400;font-size:30px;margin:0">The seams show</h2></div>
+    <p style="margin:28px 0 0;max-width:680px;color:#3d3a33">Five product teams, five interpretations of the same interface. Every release meant re-designing components that already existed somewhere else — and customers noticed. Five versions of the same table, found in one afternoon.</p>
+    <p style="margin:18px 0 0;max-width:680px;color:#3d3a33">I was asked to bring coherence, without slowing anyone down.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:20px;padding:64px 64px 0;align-items:end">
+    <div style="height:440px"><image-slot id="bl-img1" shape="rect" placeholder="The audit wall — 400 screens printed"></image-slot></div>
+    <div>
+      <div style="height:300px"><image-slot id="bl-img2" shape="rect" placeholder="Close-up — annotating divergence"></image-slot></div>
+      <p style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#6E6A5F;margin:14px 0 0">the audit: 400+ screens, every divergence mapped as intentional or accidental</p>
+    </div>
+  </div>
+  <div style="padding:88px 64px 0">
+    <div style="display:flex;align-items:baseline;gap:20px;border-bottom:1px solid #1A1917;padding-bottom:16px"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#5A7554">02</span><h2 style="font-family:Newsreader,serif;font-weight:400;font-size:30px;margin:0">Built from what worked</h2></div>
+    <p style="margin:28px 0 0;max-width:680px;color:#3d3a33">I printed 400+ screens and mapped every divergence: intentional or accidental. Teams walked the wall with me and marked what they'd fight to keep — the wall stayed up for three months and became a meeting place.</p>
+    <p style="margin:18px 0 0;max-width:680px;color:#3d3a33">The system wasn't imposed from above. It was assembled from what teams already did well, then given a name, a home, and a way to grow. We shipped the first twelve components with two teams as pilots, and let demand pull the rest.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:20px;padding:64px 64px 0;align-items:start">
+    <div>
+      <div style="height:300px"><image-slot id="bl-img3" shape="rect" placeholder="Workshop — teams naming components"></image-slot></div>
+      <p style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#6E6A5F;margin:14px 0 0">naming workshops with all five teams</p>
+    </div>
+    <div style="height:440px"><image-slot id="bl-img4" shape="rect" placeholder="The library, live in product"></image-slot></div>
+  </div>
+  <div style="padding:88px 64px 0">
+    <div style="display:flex;align-items:baseline;gap:20px;border-bottom:1px solid #1A1917;padding-bottom:16px"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#5A7554">03</span><h2 style="font-family:Newsreader,serif;font-weight:400;font-size:30px;margin:0">Self-sustaining</h2></div>
+    <p style="margin:28px 0 0;max-width:680px;color:#3d3a33">Design-to-build time dropped 60%. 120 components live across every product. And the part I'm proudest of — the system became self-sustaining, with every team contributing components back.</p>
+  </div>
+  <div style="height:560px;margin-top:64px"><image-slot id="bl-img5" shape="rect" placeholder="Closing scene — the system in use"></image-slot></div>
+  <p style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#6E6A5F;margin:14px 64px 0">two years on — 120 components, every team contributing</p>
+  <div style="margin:88px 64px 0;border-top:1px solid #1A1917;border-bottom:1px solid #1A1917;padding:48px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:32px">
+    <div><p style="font-family:Newsreader,serif;font-weight:400;font-size:44px;margin:0">−60%</p><p style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#5A7554;margin:8px 0 0">design-to-build time</p></div>
+    <div><p style="font-family:Newsreader,serif;font-weight:400;font-size:44px;margin:0">120</p><p style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#5A7554;margin:8px 0 0">components adopted</p></div>
+    <div><p style="font-family:Newsreader,serif;font-weight:400;font-size:44px;margin:0">5/5</p><p style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#5A7554;margin:8px 0 0">teams contributing</p></div>
+  </div>
+  <div style="padding:56px 64px 56px;display:flex;justify-content:space-between;align-items:center">
+    <a href="Home.dc.html" style="font-family:'IBM Plex Mono',monospace;font-size:13px;text-decoration:none;color:#6E6A5F">← all work</a>
+    <a href="#" style="font-family:'IBM Plex Mono',monospace;font-size:13px;text-decoration:none">next: designing for publics →</a>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
