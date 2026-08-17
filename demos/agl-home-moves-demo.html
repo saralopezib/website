@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home moves orchestration — Kaluza AGL demo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #F4EFE7; font-family: 'Inter','Helvetica Neue',sans-serif; color: #1E1E1E; }
+  @keyframes kzpulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.55); opacity: 0.45; } }
+  @keyframes kzflow { 0% { transform: translateX(-6px); opacity: 0; } 40% { opacity: 1; } 100% { transform: translateX(8px); opacity: 0; } }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: rgba(30,30,30,0.16); border-radius: 99px; }
+  button { font-family: inherit; }
+  .ms { font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal; line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-feature-settings: 'liga'; -webkit-font-smoothing: antialiased; }
+  .ms-fill { font-variation-settings: 'FILL' 1; }
+</style>
+</head>
+<body>
+<div id="app" style="min-height:100vh; background:#F4EFE7; display:flex; flex-direction:column;"></div>
+
+<script>
+// =====================================================================
+// JOURNEYS — data keyed by 'movein' | 'moveout' | 'cancel'
+// =====================================================================
+
+const ACCOUNT = {
+  customerName: 'Customer Name',
+  accountNumber: '12345678',
+  identifier: 'SP123456789',
+  identifierLabel: 'NMI',
+  supplyAddress: '1 Customer Road, Manner House, Melbourne',
+  region: 'VIC:UNITED',
+  postcode: '3000',
+  retailerStartDate: '2022-10-18',
+  meterMsn: 'MSN987654321',
+  meterType: 'Smart',
+};
+
+const JOURNEYS = {
+  movein: {
+    label: 'Move-in',
+    icon: 'home_work',
+    stages: [
+      { num: '01', name: 'Access & configuration',
+        headline: 'The advisor opens the move-in from the Home moves dashboard',
+        note: 'The advisor lands on the customer\'s Home moves dashboard and reviews the supply details for the property. From here they trigger the move-in flow against the selected fuel.',
+        customer: { icon: 'search', text: 'A new tenant arrives at the property — supply and meter already on file', sub: 'No guessing whether they can move in here.' },
+        log: [['storeJourney', 'journey'], ['updateJourneyStatus · started', 'journey'], ['storeWorkflow', 'journey'], ['ensureEnergyAcquisitionAndSaleDetailsExists', 'acquisition'], ['updateEnergyAcquisitionCoolingOffPeriod', 'acquisition'], ['fetchMoveInState', 'state']] },
+      { num: '02', name: 'Acquisition & signup',
+        headline: 'Details captured and the move-in submitted',
+        noSplit: true,
+        note: 'The advisor fills the move-in form — supply start, site access, appointment — and submits. One submission ends prior device ownership, creates the account, attaches billing preferences and notifies the market.',
+        customer: { icon: 'mark_email_read', text: 'Receives confirmation that their move-in is scheduled', sub: 'One conversation, supply set up.' },
+        log: [['endDeviceOwnership', 'device'], ['publishKegAccountLifecycleEvent', 'keg'], ['createAccount', 'account'], ['updateEnergyAcquisitionAccountId', 'acquisition'], ['publishKegAccountLifecycleEvent', 'keg'], ['createIndustryMoveIn', 'industry'], ['createBillingPreferences', 'billing']] },
+      { num: '03', name: 'Fulfilment & activation',
+        headline: 'The market confirms and the supply is provisioned',
+        note: 'The workflow waits for the supply start date and publishes KEG lifecycle events at each milestone. The meter is activated and the dashboard updates with the new retailer start date.',
+        customer: { icon: 'check_circle', text: 'Power is on by move-in day — confirmed in advance', sub: 'Proactive SMS milestones, no move-in-day anxiety.' },
+        log: [['waitForEndDateAndPublish', 'wait'], ['publishKegAccountLifecycleEvent', 'keg'], ['waitForStartDateAndPublish', 'wait'], ['publishKegAccountLifecycleEvent', 'keg']] },
+      { num: '04', name: 'First bill & onboarding',
+        headline: 'First bill is issued and the workflow is closed out',
+        note: 'The workflow status is finalised and the journey is marked complete. The billing engine issues the first statement from the actual meter read.',
+        customer: { icon: 'receipt_long', text: 'Receives the first bill — clear, from an actual read', sub: 'The moment of truth: the bill makes sense.' },
+        log: [['updateWorkflowStatus · completed', 'journey'], ['updateJourneyStatus · completed', 'journey'], ['First bill issued · $128.40', 'billing']] },
+    ],
+    services: [
+      { id: 'journey', name: 'Journey & workflow', icon: 'account_tree', levels: [2, 2, 2, 3], msgs: ['storeJourney · storeWorkflow', 'In progress', 'In progress', 'updateWorkflowStatus · completed'] },
+      { id: 'acquisition', name: 'Energy acquisition', icon: 'assignment', levels: [3, 3, 3, 3], msgs: ['Sale details ensured · cooling-off set', 'updateEnergyAcquisitionAccountId', 'Linked to account', 'Linked'] },
+      { id: 'state', name: 'Move-in state', icon: 'home', levels: [3, 3, 3, 3], msgs: ['fetchMoveInState · loaded', 'State updated', 'State updated', 'State updated'] },
+      { id: 'device', name: 'Device ownership', icon: 'power', levels: [0, 3, 3, 3], msgs: ['Idle', 'endDeviceOwnership · prior tenant', 'Ended', 'Ended'] },
+      { id: 'account', name: 'Account creation', icon: 'person_add', levels: [0, 3, 3, 3], msgs: ['Idle', 'createAccount · new customer', 'Active', 'Active'] },
+      { id: 'industry', name: 'Industry move-in', icon: 'factory', levels: [0, 3, 3, 3], msgs: ['Idle', 'createIndustryMoveIn · AEMO submitted', 'Active with market', 'Settled'] },
+      { id: 'billing', name: 'Billing preferences', icon: 'receipt_long', levels: [0, 3, 3, 3], msgs: ['Idle', 'createBillingPreferences', 'Applied', 'First bill issued · $128.40'] },
+      { id: 'keg', name: 'KEG lifecycle events', icon: 'notifications', levels: [0, 2, 2, 3], msgs: ['Idle', 'publishKegAccountLifecycleEvent ×2', 'waitForEnd/StartDateAndPublish', 'All events published'] },
+    ],
+  },
+  moveout: {
+    label: 'Move-out',
+    icon: 'logout',
+    stages: [
+      { num: '01', name: 'Access & vacate details',
+        headline: 'The advisor opens the move-out from the Home moves dashboard',
+        note: 'The advisor reviews the existing supply, then opens the move-out form to capture the vacate date and the forwarding email for the final bill.',
+        customer: { icon: 'event_busy', text: 'Tells their advisor they\'re leaving the property', sub: 'One conversation kicks off the closure.' },
+        log: [['storeJourney · move-out', 'journey'], ['updateJourneyStatus · started', 'journey'], ['fetchMoveOutState', 'state'], ['storeMoveOutDetails', 'state']] },
+      { num: '02', name: 'Review & submit',
+        headline: 'Move-out submitted — supply scheduled to end',
+        note: 'The advisor confirms the vacate date, forwarding email and access details, then submits. The workflow updates the energy acquisition end date and queues the final read.',
+        customer: { icon: 'mark_email_read', text: 'Receives confirmation that their move-out is scheduled', sub: 'Clear handover and no surprise charges.' },
+        log: [['updateEnergyAcquisitionEndDate', 'acquisition'], ['publishKegAccountLifecycleEvent', 'keg'], ['requestFinalRead', 'finalread']] },
+      { num: '03', name: 'Supply end & AEMO',
+        headline: 'De-energisation requested and AEMO confirms',
+        note: 'The industry move-out is created with the market and the supply agreement is ended on the vacate date. A proactive SMS confirms the supply has stopped.',
+        customer: { icon: 'check_circle', text: 'Confirmed: supply has ended on the vacate day', sub: 'No ambiguity about when responsibility transfers.' },
+        log: [['createIndustryMoveOut · AEMO submitted', 'industry'], ['endSupplyAgreement', 'closure'], ['validateFinalRead', 'finalread'], ['publishKegAccountLifecycleEvent', 'keg']] },
+      { num: '04', name: 'Final bill & account close',
+        headline: 'Final bill is issued and the account is closed',
+        note: 'Billing finalises from the actual final read and processes any refund due. The account is closed cleanly with no ghost supply.',
+        customer: { icon: 'task_alt', text: 'Receives the final bill at the forwarding address — and any credit refund', sub: 'Account closure feels finished, not loose.' },
+        log: [['triggerFinalBill', 'billing'], ['processRefundIfDue', 'billing'], ['scheduleAccountClose', 'closure'], ['updateWorkflowStatus · completed', 'journey'], ['updateJourneyStatus · completed', 'journey']] },
+    ],
+    services: [
+      { id: 'journey', name: 'Journey & workflow', icon: 'account_tree', levels: [2, 2, 2, 3], msgs: ['storeJourney · storeWorkflow', 'In progress', 'In progress', 'updateWorkflowStatus · completed'] },
+      { id: 'acquisition', name: 'Energy acquisition', icon: 'assignment', levels: [3, 3, 3, 3], msgs: ['Loaded', 'updateEnergyAcquisitionEndDate', 'End-dated', 'End-dated'] },
+      { id: 'state', name: 'Move-out state', icon: 'logout', levels: [3, 3, 3, 3], msgs: ['fetchMoveOutState · loaded', 'storeMoveOutDetails', 'Captured', 'Captured'] },
+      { id: 'finalread', name: 'Final read', icon: 'speed', levels: [0, 1, 2, 3], msgs: ['Idle', 'requestFinalRead · queued', 'validateFinalRead · awaiting', 'Final read validated'] },
+      { id: 'industry', name: 'Industry move-out', icon: 'factory', levels: [0, 0, 2, 3], msgs: ['Idle', 'Idle', 'createIndustryMoveOut · AEMO', 'De-energisation confirmed'] },
+      { id: 'closure', name: 'Account closure', icon: 'lock', levels: [0, 0, 2, 3], msgs: ['Idle', 'Idle', 'endSupplyAgreement', 'Account closed'] },
+      { id: 'billing', name: 'Billing finalisation', icon: 'receipt_long', levels: [0, 0, 0, 3], msgs: ['Idle', 'Idle', 'Queued for final cycle', 'triggerFinalBill · refund processed'] },
+      { id: 'keg', name: 'KEG lifecycle events', icon: 'notifications', levels: [0, 2, 2, 3], msgs: ['Idle', 'publishKegAccountLifecycleEvent', 'waitForEndDateAndPublish', 'Published'] },
+    ],
+  },
+  cancel: {
+    label: 'Cancel',
+    icon: 'cancel_schedule_send',
+    stages: [
+      { num: '01', name: 'Open scheduled action',
+        headline: 'The advisor opens the customer\'s scheduled home move',
+        note: 'The advisor lands on the dashboard and sees a pending home move (a move-in or a move-out) scheduled for a future date. They select it to begin the cancellation.',
+        customer: { icon: 'event_busy', text: 'Tells their advisor the home move isn\'t going ahead', sub: 'Plans changed — needs to undo the scheduled action.' },
+        log: [['storeJourney · cancel-scheduled', 'journey'], ['updateJourneyStatus · started', 'journey'], ['fetchScheduledHomeMove', 'state'], ['validateCancellationWindow', 'state']] },
+      { num: '02', name: 'Review & confirm',
+        headline: 'The advisor reviews what will be reversed and confirms',
+        note: 'The screen lists everything the cancellation will undo — industry message, account state, billing setup — and captures a reason code before submission.',
+        customer: { icon: 'fact_check', text: 'Reviews what\'s being cancelled with the advisor', sub: 'No surprises about what reverses.' },
+        log: [['recordCancellationReason', 'reason'], ['publishKegAccountLifecycleEvent', 'keg']] },
+      { num: '03', name: 'Industry reversal & state restore',
+        headline: 'AEMO withdrawal sent and the account state is restored',
+        note: 'The original AEMO industry message is withdrawn, the contract reverts to its pre-scheduled state, and any billing preferences put in place for the move are rolled back.',
+        customer: { icon: 'check_circle', text: 'Receives confirmation that the home move has been cancelled', sub: 'Account back to where it was before — no ghost dates.' },
+        log: [['withdrawIndustryHomeMove · AEMO', 'industry'], ['revertAccountState', 'restore'], ['reverseBillingPreferences', 'billing'], ['publishKegAccountLifecycleEvent', 'keg']] },
+      { num: '04', name: 'Cancellation complete',
+        headline: 'The scheduled home move is removed from the account',
+        note: 'The dashboard reflects the cancellation — no pending move, no scheduled date. The workflow and journey are marked complete.',
+        customer: { icon: 'task_alt', text: 'Sees a clean account with no pending action', sub: 'Closure feels resolved — they can re-book if plans change again.' },
+        log: [['updateWorkflowStatus · completed', 'journey'], ['updateJourneyStatus · completed', 'journey'], ['Notify customer · cancellation confirmed', 'notifications']] },
+    ],
+    services: [
+      { id: 'journey', name: 'Journey & workflow', icon: 'account_tree', levels: [2, 2, 2, 3], msgs: ['storeJourney · storeWorkflow', 'In progress', 'In progress', 'updateWorkflowStatus · completed'] },
+      { id: 'state', name: 'Scheduled action lookup', icon: 'search', levels: [3, 3, 3, 3], msgs: ['fetchScheduledHomeMove · loaded', 'Validated · within window', 'Validated', 'Validated'] },
+      { id: 'reason', name: 'Cancellation reason', icon: 'edit_note', levels: [0, 3, 3, 3], msgs: ['Idle', 'recordCancellationReason', 'Captured', 'Captured'] },
+      { id: 'industry', name: 'Industry reversal', icon: 'undo', levels: [0, 0, 2, 3], msgs: ['Idle', 'Idle', 'withdrawIndustryHomeMove · AEMO', 'Withdrawal confirmed'] },
+      { id: 'restore', name: 'Account state restore', icon: 'restore', levels: [0, 0, 2, 3], msgs: ['Idle', 'Idle', 'revertAccountState', 'Restored to pre-scheduled'] },
+      { id: 'billing', name: 'Billing reversal', icon: 'receipt_long', levels: [0, 0, 2, 3], msgs: ['Idle', 'Idle', 'reverseBillingPreferences', 'Preferences rolled back'] },
+      { id: 'notifications', name: 'Customer notification', icon: 'notifications', levels: [0, 0, 0, 3], msgs: ['Idle', 'Idle', 'Queued', 'Cancellation email sent'] },
+      { id: 'keg', name: 'KEG lifecycle events', icon: 'sync_alt', levels: [0, 2, 2, 3], msgs: ['Idle', 'publishKegAccountLifecycleEvent', 'publishKegAccountLifecycleEvent', 'Published'] },
+    ],
+  },
+};
+
+const TAG_COLOR = { journey: '#2f4379', acquisition: '#5A7554', state: '#78716c', device: '#b07a4a', account: '#5A7554', industry: '#1f7a54', billing: '#03a649', keg: '#b07a4a', wait: '#8a6d3b', finalread: '#5A7554', closure: '#2f4379', retention: '#b07a4a', exitfee: '#8a6d3b' };
+
+// =====================================================================
+// STATE & NAVIGATION
+// =====================================================================
+
+const state = { journey: 'movein', stage: 0 };
+
+function pad(n) { return String(n).padStart(2, '0'); }
+function fmt(sec) { return `${pad(Math.floor(sec/3600))}:${pad(Math.floor((sec%3600)/60))}:${pad(sec%60)}`; }
+
+function maxStage() { return JOURNEYS[state.journey].stages.length - 1; }
+function go(i) { state.stage = Math.max(0, Math.min(maxStage(), i)); render(); }
+function next() { state.stage = state.stage >= maxStage() ? 0 : state.stage + 1; render(); }
+function back() { state.stage = Math.max(0, state.stage - 1); render(); }
+function setJourney(j) { state.journey = j; state.stage = 0; render(); }
+
+// =====================================================================
+// REUSABLE PROTOTYPE-STYLE COMPONENTS
+// =====================================================================
+
+const card = (inner, extra='') => `<div style="background:#ffffff; border:1px solid #d6d3d1; border-radius:8px; box-shadow:0 0 6px 0 rgba(0,0,0,0.10); ${extra}">${inner}</div>`;
+
+const browserChrome = (title='Kaluza · agent workspace') => `<div style="display:flex; align-items:center; gap:8px; padding:9px 14px; background:#fafaf9; border-bottom:1px solid #d6d3d1;">
+  <div style="display:flex; gap:5px;"><span style="width:9px; height:9px; border-radius:50%; background:#d6d3d1;"></span><span style="width:9px; height:9px; border-radius:50%; background:#d6d3d1;"></span><span style="width:9px; height:9px; border-radius:50%; background:#d6d3d1;"></span></div>
+  <div style="font-size:11px; font-weight:500; color:#78716c; margin-left:4px;">${title}</div>
+  <span class="ms" style="margin-left:auto; font-size:16px; color:#a8a29e;">support_agent</span>
+</div>`;
+
+const summaryItem = (label, value) => `<div><div style="font-size:11px; font-weight:600; color:#292524;">${label}</div><div style="font-size:11px; color:#57534e; margin-top:1px;">${value}</div></div>`;
+
+const fuelCard = (opts = {}) => {
+  const elec = ACCOUNT;
+  const meterStatusLabel = opts.meterStatusLabel || 'Meter status';
+  const siteStatusBadge = opts.siteStatus || `<span style="display:inline-block; padding:2px 8px; border-radius:99px; background:#fcf3f5; color:#d40c3c; font-size:10px; font-weight:600;">De-energised</span>`;
+  const supplyItems = [
+    summaryItem(elec.identifierLabel, elec.identifier),
+    summaryItem('Region', elec.region),
+    summaryItem('Supply address', elec.supplyAddress),
+    summaryItem('Postcode', elec.postcode),
+    summaryItem('Retailer start', elec.retailerStartDate),
+  ];
+  if (!opts.hideSiteStatus) supplyItems.push(summaryItem('Site status', siteStatusBadge));
+  return `<section style="padding:14px 16px;">
+    <header style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+      <span class="ms" style="font-size:18px; color:#292524;">bolt</span>
+      <h2 style="font-size:14px; font-weight:700; color:#292524; margin:0;">Electricity</h2>
+    </header>
+    <div style="font-size:11px; font-weight:700; color:#292524; margin-bottom:9px; letter-spacing:-0.005em;">Supply details</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px 14px;">
+      ${supplyItems.join('')}
+    </div>
+    <div style="border-top:1px solid #f1eee9; margin:14px 0 12px;"></div>
+    <div style="font-size:11px; font-weight:700; color:#292524; margin-bottom:9px; letter-spacing:-0.005em;">Meter details</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px 14px;">
+      ${summaryItem('MSN', elec.meterMsn)}
+      ${summaryItem('Type', elec.meterType)}
+      ${summaryItem(meterStatusLabel, `<span style="color:#03a649; font-weight:600;">Active</span>`)}
+    </div>
+  </section>`;
+};
+
+const primaryBtn = (label) => `<div style="display:inline-flex; align-items:center; padding:8px 16px; border-radius:4px; background:#2f4379; color:#fff; font-size:12px; font-weight:600;">${label}</div>`;
+
+const secondaryBtn = (label) => `<div style="display:inline-flex; align-items:center; padding:8px 16px; border-radius:4px; background:#fff; color:#2f4379; border:1px solid #2f4379; font-size:12px; font-weight:600;">${label}</div>`;
+
+const notification = (kind, title, body) => {
+  const bg = kind === 'success' ? '#f0fff6' : '#fcf3f5';
+  const fg = kind === 'success' ? '#03a649' : '#d40c3c';
+  const icon = kind === 'success' ? 'check_circle' : 'error';
+  return `<div style="display:flex; align-items:flex-start; gap:9px; padding:11px 13px; border-radius:4px; background:${bg}; border-left:4px solid ${fg};">
+    <span class="ms ms-fill" style="font-size:18px; color:${fg};">${icon}</span>
+    <div><div style="font-size:12px; font-weight:600; color:#292524;">${title}</div>${body?`<div style="font-size:11px; color:#57534e; margin-top:2px;">${body}</div>`:''}</div>
+  </div>`;
+};
+
+const field = (label, value, hint) => `<div style="margin-bottom:10px;">
+  <div style="font-size:10px; font-weight:600; color:#292524; margin-bottom:3px;">${label}</div>
+  <div style="padding:7px 9px; border:1px solid #d6d3d1; border-radius:4px; font-size:11px; color:#292524; background:#fff;">${value}</div>
+  ${hint?`<div style="font-size:10px; color:#78716c; margin-top:3px;">${hint}</div>`:''}
+</div>`;
+
+const radioInline = (label, options, selected) => `<div style="margin-bottom:10px;">
+  <div style="font-size:10px; font-weight:600; color:#292524; margin-bottom:5px;">${label}</div>
+  <div style="display:flex; gap:14px;">
+    ${options.map(o => `<div style="display:flex; align-items:center; gap:5px; font-size:11px; color:#292524;"><span style="width:13px; height:13px; border-radius:50%; border:2px solid ${o===selected?'#2f4379':'#d6d3d1'}; display:inline-flex; align-items:center; justify-content:center;">${o===selected?'<span style="width:6px; height:6px; border-radius:50%; background:#2f4379;"></span>':''}</span>${o}</div>`).join('')}
+  </div>
+</div>`;
+
+const sectionTitle = (t) => `<div style="font-size:13px; font-weight:700; color:#292524; margin:0 0 9px;">${t}</div>`;
+
+const breadcrumb = (...crumbs) => `<div style="display:flex; align-items:center; gap:6px; font-size:11px; color:#78716c; margin-bottom:10px;">
+  ${crumbs.map((c,i)=>`${i>0?'<span class="ms" style="font-size:13px; color:#a8a29e;">chevron_right</span>':''}<span style="${i===crumbs.length-1?'color:#292524; font-weight:500;':''}">${c}</span>`).join('')}
+</div>`;
+
+// =====================================================================
+// ADVISOR SCREENS — per journey × per stage
+// =====================================================================
+
+function advisorScreen(journey, stage) {
+  let inner = '';
+
+  if (journey === 'movein') {
+    if (stage === 0) {
+      inner = `${breadcrumb('Home moves', 'Move-in')}
+        <div style="font-size:18px; font-weight:700; color:#292524; margin-bottom:16px;">Home moves</div>
+        ${card(fuelCard(), 'margin-bottom:24px;')}
+        <div style="display:flex; gap:8px;">${primaryBtn('Create move-in', 'arrow_forward')}${secondaryBtn('Move out')}</div>`;
+    } else if (stage === 1) {
+      inner = `${breadcrumb('Home moves', 'Move-in', 'Update')}
+        <div style="font-size:16px; font-weight:700; color:#292524; margin-bottom:16px;">Move-in</div>
+        ${card(`<div style="padding:14px 16px;">
+          ${sectionTitle('Account context')}
+          ${field('Supply address', ACCOUNT.supplyAddress + ', VIC')}
+          ${field(ACCOUNT.identifierLabel, ACCOUNT.identifier)}
+          <div style="border-top:1px solid #f1eee9; margin:14px 0;"></div>
+          ${sectionTitle('Move-in date')}
+          ${field('Move-in date', '18 Jul 2026', 'Can be in the past')}
+          <div style="border-top:1px solid #f1eee9; margin:14px 0;"></div>
+          ${sectionTitle('Site access and hazards')}
+          ${field('Access details', 'Side gate, lock-box code 4218', 'Maximum 160 characters')}
+          ${field('Hazards', 'Not known to initiator', 'Up to 300 characters')}
+          <div style="border-top:1px solid #f1eee9; margin:14px 0;"></div>
+          ${sectionTitle('Appointment and instructions')}
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">${field('Appointment date', '18 Jul 2026')}${field('Appointment reference', 'APT-7421')}</div>
+          ${field('Special instructions', 'eg: Please call before attending')}
+          ${radioInline('Customer consultation required', ['No','Yes'], 'No')}
+        </div>`, 'margin-bottom:24px;')}
+        <div style="display:flex; gap:8px;">${primaryBtn('Submit move-in', 'check')}${secondaryBtn('Discard')}</div>`;
+    } else if (stage === 2) {
+      inner = `${breadcrumb('Home moves', 'Move-in', 'Success')}
+        <div style="font-size:18px; font-weight:700; color:#292524; margin-bottom:16px;">Home moves</div>
+        <div style="margin-bottom:24px;">${notification('success', 'Move-in successfully scheduled')}</div>
+        ${card(fuelCard({ hideSiteStatus: true, meterStatusLabel: 'Status' }))}`;
+    } else {
+      inner = `${breadcrumb('Account home')}
+        <div style="font-size:18px; font-weight:700; color:#292524; margin-bottom:16px;">First bill</div>
+        ${card(`<div style="padding:14px 16px;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:11px;"><span class="ms" style="font-size:18px; color:#292524;">bolt</span><div style="flex:1; font-size:13px; font-weight:700; color:#292524;">Electricity</div><span style="font-size:10px; padding:2px 8px; border-radius:99px; background:#f0fff6; color:#03a649; font-weight:600;">Actual read</span></div>
+          <div style="display:grid; grid-template-columns:1fr auto; gap:6px 12px; font-size:11px;">
+            <span style="color:#57534e;">Usage · 242 kWh</span><span style="color:#292524; font-weight:600;">$108.20</span>
+            <span style="color:#57534e;">Supply charge</span><span style="color:#292524; font-weight:600;">$20.20</span>
+          </div>
+          <div style="border-top:1px solid #f1eee9; margin:11px 0;"></div>
+          <div style="display:flex; justify-content:space-between; align-items:baseline;"><div><div style="font-size:11px; color:#57534e;">Total due</div><div style="font-size:10px; color:#78716c;">Due 12 Aug 2026</div></div><div style="font-size:20px; font-weight:700; color:#2f4379;">$128.40</div></div>
+        </div>`, 'margin-bottom:24px;')}
+        <div style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px; border-radius:99px; background:#f0fff6;"><span class="ms ms-fill" style="font-size:14px; color:#03a649;">check_circle</span><span style="font-size:11px; color:#03a649; font-weight:600;">Direct debit active</span></div>`;
+    }
+  } else if (journey === 'moveout') {
+    if (stage === 0) {
+      inner = `${breadcrumb('Home moves')}
+        <div style="font-size:18px; font-weight:700; color:#292524; margin-bottom:16px;">Home moves</div>
+        ${card(fuelCard(), 'margin-bottom:24px;')}
+        <div style="display:flex; gap:8px;">${secondaryBtn('Create move-in')}${primaryBtn('Move out', 'arrow_forward')}</div>`;
+    } else if (stage === 1) {
+      inner = `${breadcrumb('Home moves', 'Move-out')}
+        <div style="font-size:16px; font-weight:700; color:#292524; margin-bottom:16px;">Move-out</div>
+        ${card(`<div style="padding:14px 16px;">
+          ${sectionTitle('Move-out date')}
+          ${field('Move-out date', '15 Aug 2026')}
+          ${sectionTitle('Final email address')}
+          ${field('Email', 'customer@example.com', 'For the final bill and any credit refund')}
+          ${sectionTitle('Site access and hazards')}
+          ${field('Access details', 'Side gate · lock-box 4218')}
+        </div>`, 'margin-bottom:24px;')}
+        <div>${primaryBtn('Submit move-out', 'check')}</div>`;
+    } else if (stage === 2) {
+      inner = `${breadcrumb('Home moves')}
+        <div style="font-size:18px; font-weight:700; color:#292524; margin-bottom:10px;">Home moves</div>
+        <div style="margin-bottom:24px;">${notification('success', 'Move-out scheduled', 'De-energisation requested · supply ends 15 Aug 2026')}</div>
+        ${card(`<section style="padding:14px 16px;">
+          <header style="display:flex; align-items:center; gap:8px; margin-bottom:11px;">
+            <span class="ms" style="font-size:18px; color:#292524;">bolt</span>
+            <h2 style="font-size:14px; font-weight:700; color:#292524; margin:0;">Electricity</h2>
+          </header>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px 14px;">
+            ${summaryItem(ACCOUNT.identifierLabel, ACCOUNT.identifier)}
+            ${summaryItem('Region', ACCOUNT.region)}
+            ${summaryItem('Supply address', ACCOUNT.supplyAddress)}
+            ${summaryItem('Move-out date', '15 Aug 2026')}
+          </div>
+        </section>`)}`;
+    } else {
+      inner = `${breadcrumb('Account home')}
+        <div style="font-size:18px; font-weight:700; color:#292524; margin-bottom:16px;">Final bill</div>
+        ${card(`<div style="padding:14px 16px;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:11px;"><span class="ms" style="font-size:18px; color:#292524;">bolt</span><div style="flex:1; font-size:13px; font-weight:700; color:#292524;">Electricity · final period</div><span style="font-size:10px; padding:2px 8px; border-radius:99px; background:#f0fff6; color:#03a649; font-weight:600;">Actual read</span></div>
+          <div style="display:grid; grid-template-columns:1fr auto; gap:6px 12px; font-size:11px;">
+            <span style="color:#57534e;">Usage to 15 Aug</span><span style="color:#292524; font-weight:600;">$42.10</span>
+            <span style="color:#57534e;">Supply charge</span><span style="color:#292524; font-weight:600;">$8.40</span>
+            <span style="color:#57534e;">Credit refund</span><span style="color:#03a649; font-weight:600;">-$22.50</span>
+          </div>
+          <div style="border-top:1px solid #f1eee9; margin:11px 0;"></div>
+          <div style="display:flex; justify-content:space-between; align-items:baseline;"><div><div style="font-size:11px; color:#57534e;">Final total</div><div style="font-size:10px; color:#78716c;">Sent to forwarding email</div></div><div style="font-size:20px; font-weight:700; color:#2f4379;">$28.00</div></div>
+        </div>`, 'margin-bottom:24px;')}
+        <div style="display:inline-flex; align-items:center; gap:5px; padding:5px 10px; border-radius:99px; background:#f0fff6;"><span class="ms ms-fill" style="font-size:14px; color:#03a649;">check_circle</span><span style="font-size:11px; color:#03a649; font-weight:600;">Account closed</span></div>`;
+    }
+  } else if (journey === 'cancel') {
+    if (stage === 0) {
+      inner = `${breadcrumb('Home moves')}
+        <div style="font-size:18px; font-weight:700; color:#292524; margin-bottom:16px;">Home moves</div>
+        ${card(`<section style="padding:14px 16px;">
+          <header style="display:flex; align-items:center; gap:8px; margin-bottom:11px;">
+            <span class="ms" style="font-size:18px; color:#292524;">bolt</span>
+            <h2 style="font-size:14px; font-weight:700; color:#292524; margin:0;">Electricity</h2>
+            <span style="margin-left:auto; display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:99px; background:#fff7e6; font-size:10.5px; font-weight:600; color:#8a6d3b;"><span class="ms" style="font-size:13px; color:#b07a4a;">schedule</span>Move-in scheduled</span>
+          </header>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px 14px;">
+            ${summaryItem(ACCOUNT.identifierLabel, ACCOUNT.identifier)}
+            ${summaryItem('Supply address', ACCOUNT.supplyAddress)}
+            ${summaryItem('Scheduled start', '18 Jul 2026')}
+            ${summaryItem('Reference', 'MV-48217')}
+          </div>
+        </section>`, 'margin-bottom:24px;')}
+        <div style="display:flex; gap:8px;">${secondaryBtn('Amend move-in')}${primaryBtn('Cancel move-in')}</div>`;
+    } else if (stage === 1) {
+      inner = `${breadcrumb('Home moves', 'Cancel move-in')}
+        <div style="font-size:16px; font-weight:700; color:#292524; margin-bottom:16px;">Cancel scheduled move-in</div>
+        ${card(`<div style="padding:14px 16px;">
+          ${sectionTitle('What will be reversed')}
+          <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:11px;">
+            <div style="display:flex; align-items:center; gap:8px; font-size:11.5px; color:#292524;"><span class="ms" style="font-size:15px; color:#b07a4a;">undo</span>Industry move-in (AEMO) will be withdrawn</div>
+            <div style="display:flex; align-items:center; gap:8px; font-size:11.5px; color:#292524;"><span class="ms" style="font-size:15px; color:#b07a4a;">undo</span>Account returns to its pre-scheduled state</div>
+            <div style="display:flex; align-items:center; gap:8px; font-size:11.5px; color:#292524;"><span class="ms" style="font-size:15px; color:#b07a4a;">undo</span>Billing preferences rolled back</div>
+          </div>
+          <div style="border-top:1px solid #f1eee9; margin:11px 0;"></div>
+          ${sectionTitle('Cancellation details')}
+          ${field('Reason', 'Customer changed plans')}
+          ${field('Reference', 'MV-48217')}
+        </div>`, 'margin-bottom:24px;')}
+        <div>${primaryBtn('Confirm cancellation')}</div>`;
+    } else if (stage === 2) {
+      inner = `${breadcrumb('Home moves')}
+        <div style="font-size:18px; font-weight:700; color:#292524; margin-bottom:10px;">Home moves</div>
+        <div style="margin-bottom:24px;">${notification('success', 'Cancellation submitted', 'AEMO withdrawal sent · account state restoring')}</div>
+        ${card(`<div style="padding:14px 16px;">
+          <div style="display:grid; grid-template-columns:1fr auto; gap:6px 12px; font-size:11px;">
+            <span style="color:#57534e;">Original move-in</span><span style="color:#292524; font-weight:600;">MV-48217 · 18 Jul 2026</span>
+            <span style="color:#57534e;">AEMO withdrawal</span><span style="color:#03a649; font-weight:600;">Sent</span>
+            <span style="color:#57534e;">Account state</span><span style="color:#78716c;">Restoring…</span>
+            <span style="color:#57534e;">Billing preferences</span><span style="color:#78716c;">Rolling back…</span>
+          </div>
+        </div>`)}`;
+    } else {
+      inner = `${breadcrumb('Home moves')}
+        <div style="font-size:18px; font-weight:700; color:#292524; margin-bottom:10px;">Home moves</div>
+        <div style="margin-bottom:24px;">${notification('success', 'Move-in cancelled', 'No pending action on this account')}</div>
+        ${card(`<section style="padding:14px 16px;">
+          <header style="display:flex; align-items:center; gap:8px; margin-bottom:11px;">
+            <span class="ms" style="font-size:18px; color:#292524;">bolt</span>
+            <h2 style="font-size:14px; font-weight:700; color:#292524; margin:0;">Electricity</h2>
+          </header>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px 14px;">
+            ${summaryItem(ACCOUNT.identifierLabel, ACCOUNT.identifier)}
+            ${summaryItem('Supply address', ACCOUNT.supplyAddress)}
+            ${summaryItem('Site status', `<span style="display:inline-block; padding:2px 8px; border-radius:99px; background:#f5f5f4; color:#78716c; font-size:10px; font-weight:600;">No pending action</span>`)}
+            ${summaryItem('Move-in reference', `<span style="color:#a8a29e; text-decoration:line-through;">MV-48217</span>`)}
+          </div>
+        </section>`)}`;
+    }
+  }
+
+  return `<div style="display:flex; flex-direction:column; width:100%; background:#ffffff; border:1px solid #d6d3d1; border-radius:8px; overflow:hidden; box-shadow:0 0 6px 0 rgba(0,0,0,0.10);">
+    <div style="padding:24px;">${inner}</div>
+  </div>`;
+}
+
+// =====================================================================
+// SERVICE NODE
+// =====================================================================
+
+function serviceNode(svc) {
+  const lvl = svc.lvl;
+  const active = lvl >= 2;
+  const iconBg = active ? '#eef2fa' : '#f5f5f4';
+  const iconFg = active ? '#2f4379' : '#a8a29e';
+  const opacity = lvl === 0 ? '0.55' : '1';
+  let pill = '';
+  if (lvl === 0) pill = `<span style="display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:99px; background:#f5f5f4; font-size:10.5px; font-weight:500; color:#78716c; white-space:nowrap;"><span style="width:6px; height:6px; border-radius:50%; background:#d6d3d1;"></span>Idle</span>`;
+  else if (lvl === 1) pill = `<span style="display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:99px; background:#fff7e6; font-size:10.5px; font-weight:600; color:#8a6d3b; white-space:nowrap;"><span style="width:6px; height:6px; border-radius:50%; background:#cdbaa4;"></span>Queued</span>`;
+  else if (lvl === 2) pill = `<span style="display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:99px; background:#eef2fa; font-size:10.5px; font-weight:600; color:#2f4379; white-space:nowrap;"><span style="width:6px; height:6px; border-radius:50%; background:#2f4379; animation:kzpulse 1.1s ease-in-out infinite;"></span>Processing</span>`;
+  else pill = `<span style="display:inline-flex; align-items:center; gap:4px; padding:3px 9px 3px 7px; border-radius:99px; background:#f0fff6; font-size:10.5px; font-weight:600; color:#03a649; white-space:nowrap;"><span class="ms ms-fill" style="font-size:13px; color:#03a649;">check_circle</span>Confirmed</span>`;
+  return `<div style="display:flex; flex-direction:column; gap:7px; padding:13px 15px; background:#ffffff; border:1px solid #d6d3d1; border-radius:16px; box-shadow:0 0 6px 0 rgba(0,0,0,0.06); transition:opacity .4s ease; opacity:${opacity};">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div style="flex:none; width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; background:${iconBg}; transition:background .4s ease;">
+        <span class="ms" style="font-size:19px; color:${iconFg}; transition:color .4s ease;">${svc.icon}</span>
+      </div>
+      <div style="font-weight:700; font-size:13px; color:#292524; line-height:1.2; letter-spacing:-0.01em;">${svc.label}</div>
+      <div style="margin-left:auto; flex:none;">${pill}</div>
+    </div>
+    <div style="font-weight:400; font-size:11.5px; color:#57534e; line-height:1.4; padding-left:44px; min-height:16px;">${svc.msg}</div>
+  </div>`;
+}
+
+// =====================================================================
+// RENDER
+// =====================================================================
+
+function render() {
+  const journey = JOURNEYS[state.journey];
+  const STAGES = journey.stages;
+  const SERVICES = journey.services;
+  const s = state.stage;
+  const cur = STAGES[s];
+  const services = SERVICES.map(sv => ({ label: sv.name, icon: sv.icon, msg: sv.msgs[s], lvl: sv.levels[s] }));
+  const confirmedCount = services.filter(x => x.lvl === 3).length;
+  const processingCount = services.filter(x => x.lvl === 2).length;
+  const queuedCount = services.filter(x => x.lvl === 1).length;
+  // Weighted progress: confirmed = full, processing = half, queued = quarter
+  const weightedPct = ((confirmedCount + processingCount * 0.5 + queuedCount * 0.25) / SERVICES.length * 100).toFixed(1) + '%';
+
+  const steps = STAGES.map((st, i) => {
+    const isCur = i === s, isPast = i < s;
+    return {
+      name: st.name, numLabel: st.num, i,
+      bg: isCur ? '#1E1E1E' : (isPast ? 'rgba(136,158,130,0.12)' : '#F2EEE7'),
+      border: isCur ? '#1E1E1E' : (isPast ? 'rgba(136,158,130,0.40)' : 'rgba(30,30,30,0.08)'),
+      numBg: isCur ? 'rgba(238,232,223,0.18)' : (isPast ? 'rgba(136,158,130,0.25)' : '#E7E0D5'),
+      numFg: isCur ? '#EEE8DF' : (isPast ? '#5A7554' : '#a8a29e'),
+      nameFg: isCur ? '#EEE8DF' : (isPast ? '#5A7554' : '#78716C'),
+    };
+  });
+
+  const dots = STAGES.map((_, i) => ({
+    w: i === s ? '22px' : '8px',
+    bg: i === s ? '#1E1E1E' : (i < s ? '#889E82' : 'rgba(30,30,30,0.14)'),
+  }));
+
+  const segActive = "padding:6px 15px; border-radius:999px; border:none; cursor:pointer; font-size:12px; font-weight:600; background:#1E1E1E; color:#EEE8DF;";
+  const segIdle = "padding:6px 15px; border-radius:999px; border:none; cursor:pointer; font-size:12px; font-weight:500; background:transparent; color:#78716C;";
+  const journeyKeys = ['movein','moveout','cancel'];
+
+  const header = `<header style="display:flex; align-items:center; gap:18px; padding:15px 28px; background:#F9F6F3; border-bottom:1px solid rgba(30,30,30,0.08); flex-wrap:wrap;">
+    <svg viewBox="0 0 1419.96 270" fill="#1E1E1E" xmlns="http://www.w3.org/2000/svg" style="height:18px; width:auto; display:block;" aria-label="Kaluza">
+      <path d="M263.576093786170532,119.088887990292278h-53.431166787380789l26.715523561830196-46.26893422037756L194.814688307480537.00003360118717h-84.022358876780345l-42.045881916859798,72.819920168727549,19.059678154379071,33.009476184534833h30.621108019120584l-19.059678154389985-33.009476184534833,26.73670404008044-46.305551318358994h53.398498592119722l26.736584376360042,46.305551318358994-26.715643225550593,46.26893422037756H42.030804288289801L0,191.882721468302407l42.031163279440079,72.794312132884443h84.051676487910299l26.720429774299191-46.277550008137041,26.720788765460384,46.277550008137041h84.051676487900295l42.031163279450084-72.794312132884443-42.030804288289801-72.793833478010129ZM110.773901217989987,238.158117529499577h-53.433799389189517l-26.718874145960399-46.275396061197171,26.718874145960399-46.274917406322857h53.433799389189517l26.718993809679887,46.274917406322857-26.718993809679887,46.275396061197171ZM152.80326954164957,165.366437998431138l-11.408140640819511-19.758633936451588h22.816640272800214l-11.408499631980703,19.758633936451588ZM248.266676581939464,238.158117529499577h-53.433799389189517l-26.718993809679887-46.275396061197171,26.718993809679887-46.274917406322857h53.433799389189517l26.718874145960399,46.274917406322857-26.718874145960399,46.275396061197171Z"/>
+      <path d="M720.891807186741062,233.480229769389553c-7.43197717629846,0-11.198192698760977-4.092633127549561-11.198192698760977-12.164879202491647v-77.19485189887564c0-22.471783266873899-6.816840900795796-40.072511704280259-20.262257900560144-52.300222464577018-13.483039310589447-12.227634136430424-32.251361988955978-18.429338761710824-55.815341627445378-18.429338761710824-15.227994268525435,0-28.422314908697444,2.535942971422628-39.218845380730272,7.532431044917757-10.783887536612383,5.009054385067429-19.534101444864064,11.650196795602824-26.011958428998696,19.747575493660406-6.352347116267993,7.93409327165682-11.06011651933477,16.885138293275304-14.022854340611957,26.614528392961802l34.322734551984468,11.298646567381184c2.322468922646294-9.880032590671362,6.980049703347504-18.052732534240022,13.847155850362469-24.292059470318236,7.067937260391773-6.440234673322266,17.399897324041376-9.704257476571911,30.707161520524096-9.704257476571911,13.570926867640082,0,23.789943374977156,3.402098982686766,30.380820539279739,10.105996327160938,6.578310852741197,6.716387032165585,9.917731525347335,15.717697300027794,9.917731525347335,26.76524750779754v12.918091657458717h-56.706706885670428c-13.257075574108967,0-25.271312285618478,2.159336743949098-35.703726217876465,6.415102050194946-10.382148686025175,4.243275618543521-18.680435121304981,10.608189046363805-24.656099386244023,18.944097792463253-5.975740888789005,8.323342434552615-9.001310267849476,18.981720103298358-9.001310267849476,31.686414335814334,0,12.478730496039134,3.025569379060471,23.199863098714559,9.001310267849476,31.899888384590668,5.988230576504066,8.712438349728473,14.160930520050897,15.403769382646715,24.304625781889627,19.898141360785303,10.168751261095167,4.494371978147683,21.931891613010521,6.779218589968877,34.937947451355285,6.779218589968877,12.503786495306485,0,22.685104067966677-1.832919138836587,30.255234047563135-5.448492170322424,7.570129979583726-3.603006719898985,13.382585441971969-7.946736207066351,17.261821144602436-12.905601969740019,3.929424325006039-4.996488073495129,6.917294769400542-9.428028493848615,8.875723776127415-13.181754328605166l.213397424928189-.414228538294992h6.804274589230772v1.895674072789916c0,7.59518597884562,2.674019150847926,13.67130411240214,7.934169895504965,18.05265591036914,5.310415990896217,4.431617044221639,12.290465694222803,6.678764721356856,20.777016931315302,6.678764721356856h25.045271925280758l2.849794264964657-31.196787928163758h-14.83889835336231ZM673.537960797131745,187.858772026171209c0,15.855773479463096-4.858411894065284,28.510279089607138-14.412103503494109,37.611966602213215-9.55361498558068,9.101687512609715-22.27087552966168,13.709003047079023-37.812797715591842,13.709003047079023-11.323702566638531,0-20.38776776843406-2.611187593072827-26.953512309622965-7.758394781407333-6.616009787418079-5.197395810717353-9.980486459285203-12.302955381930587-9.980486459285203-21.12849053568425,0-8.838024841445076,3.238966803991389-15.642299430679486,9.641502542634953-20.199426342762308,6.314724805437436-4.506938289699974,14.751010796298033-6.791784901526626,25.057914860690289-6.791784901526626h54.459482584668876v4.557126912088279Z"/>
+      <path d="M1101.756619726489589,233.103623541906927v-6.038495822715049l108.906398857796376-101.135437764824019v-47.215846834027616h-145.062052548631982v31.57347077949089h104.801199418672695v6.402535738646293l-.238530048045504.226040360334991-108.291185958423739,100.921963716053142v46.839163982687751h148.853324070367307l2.849794264955563-31.573394155646383h-111.818948056690715Z"/>
+      <path d="M989.033770749549149,78.713843120340243v93.929424325003311c0,20.375278080721728-4.896034204888565,36.218485248621619-14.550103059078538,47.077694030745079-9.666635165758635,10.896907716793066-22.59729313475691,16.420721132599283-38.415367679554038,16.420721132599283-14.311649634888454,0-25.660484824642481-3.979612947392525-33.720241211878601-11.813328974290926-8.072246074942086-7.833792650744726-12.164879202502561-20.111615409557999-12.164879202502561-36.469581608225781v-109.144928905830966h-36.896299834237652v111.806381745123872c0,16.031548593573461,3.100814000714308,29.979081688687074,9.227197380494545,41.466069681733643,6.113817068214303,11.486987993039293,14.67568955079696,20.475655325479238,25.447087399714292,26.702492573873315,10.771321225060092,6.239326936089128,23.199863098710011,9.402972494579444,36.92143245735133,9.402972494579444,17.148877588293544,0,30.305499293783214-3.339420672595224,39.080769201293151-9.917731525345516,8.800402530629071-6.603443475867607,14.989540844343537-13.734135670193609,18.416772450156714-21.20381178117259l.200907737224043-.439361161413217h7.206013439816161v28.146162549834116h36.155653690845611V78.713843120340243h-36.908942769644455Z"/>
+      <path d="M768.044868437300465,0v264.67701769755331h36.908866145793581V0h-36.908866145793581Z"/>
+      <path d="M1405.125280060612567,233.480229769389553c-7.431977176309374,0-11.198192698760977-4.092633127549561-11.198192698760977-12.164879202491647v-77.19485189887564c0-22.471783266873899-6.816840900795796-40.072511704280259-20.262257900560144-52.300222464577018-13.483039310587628-12.227634136430424-32.251361988946883-18.429338761710824-55.815265003588138-18.429338761710824-15.228070892384494,0-28.422391532554684,2.535942971422628-39.218922004573869,7.532431044917757-10.783887536624206,5.009054385067429-19.534101444877706,11.650196795602824-26.011958429012338,19.747575493660406-6.352347116258898,7.93409327165682-11.06011651933477,16.885138293275304-14.022854340611957,26.614528392961802l34.322734551993562,11.298646567381184c2.32254554649262-9.880032590671362,6.980049703339319-18.052732534240022,13.847155850353374-24.292059470318236,7.067937260391773-6.440234673322266,17.399897324041376-9.704257476571911,30.707161520524096-9.704257476571911,13.570926867640082,0,23.789943374977156,3.402098982686766,30.380820539281558,10.105996327160938,6.578310852750292,6.716387032165585,9.917731525347335,15.73018698773194,9.917731525347335,26.76524750779754v12.918091657458717h-56.706706885672247c-13.257075574107148,0-25.271235661763058,2.159336743949098-35.703649594019225,6.415102050194946-10.382225309882415,4.243275618543521-18.680435121303162,10.608189046363805-24.656176010092167,18.944097792463253-5.975740888785367,8.323342434552615-9.001310267847657,18.981720103298358-9.001310267847657,31.686414335814334,0,12.478730496039134,3.02556937906229,23.199863098714559,9.001310267847657,31.899888384590668,5.988230576483147,8.712438349728473,14.160930520041802,15.416335694200825,24.304625781878713,19.898141360785303,10.168751261096986,4.494371978147683,21.931891613001426,6.779218589968877,34.937947451369837,6.779218589968877,12.503786495293753,0,22.685180691800269-1.832919138836587,30.255234047550402-5.448492170322424,7.570129979583726-3.603006719898985,13.38266206582739-7.946736207066351,17.261821144602436-12.905601969740019,3.929424325006039-4.996488073495129,6.917294769400542-9.428028493848615,8.875723776127415-13.181754328605166l.213397424930008-.414228538294992h6.804351213076188v1.895674072789916c0,7.59518597884562,2.6739425270016,13.67130411240214,7.934093271655911,18.05265591036914,5.310415990887122,4.431617044221639,12.290465694235536,6.678764721356856,20.777016931328035,6.678764721356856h25.045271925269844l2.849794264964657-31.196787928163758h-14.83889835336231ZM1357.77143367100507,187.858772026171209c0,15.855773479463096-4.845845582505717,28.510279089607138-14.412103503495018,37.611966602213215-9.553614985581589,9.101687512609715-22.27087552966259,13.709003047079023-37.812797715581837,13.709003047079023-11.323702566651264,0-20.387767768435879-2.611187593072827-26.940945998070674-7.758394781407333-6.628576098981284-5.197395810717353-9.993052770847498-12.302955381930587-9.993052770847498-21.12849053568425,0-8.838024841445076,3.238966804001393-15.642299430679486,9.641502542634043-20.199426342762308,6.31472480544835-4.506938289699974,14.751010796308037-6.791784901526626,25.057914860690289-6.791784901526626h54.459482584670695v4.557126912088279Z"/>
+      <polygon points="537.853778769514975 264.67701769755331 491.152675641469614 264.67701769755331 407.618042937910104 172.567961524615384 407.618042937910104 264.67701769755331 371.776194566289632 264.67701769755331 371.776194566289632 0 407.618042937910104 0 407.618042937910104 165.763656285844263 485.038858573259859 78.713843120340243 531.338222850699822 78.713843120340243 453.138985513440275 168.738975743444826 537.853778769514975 264.67701769755331"/>
+    </svg>
+    <div style="width:1px; height:18px; background:rgba(30,30,30,0.12);"></div>
+    <div style="font-size:11.5px; color:#78716C; font-weight:400;">Home moves journeys</div>
+    <div style="margin-left:auto; display:flex; align-items:center; gap:7px; background:#EAE3D8; border-radius:999px; padding:3px;">
+      ${journeyKeys.map(k => `<button data-journey="${k}" style="${state.journey===k?segActive:segIdle}">${JOURNEYS[k].label}</button>`).join('')}
+    </div>
+  </header>`;
+
+  const body = `<div style="display:flex; align-items:stretch; gap:8px; padding:44px 28px 24px; background:#F4EFE7; flex-wrap:wrap;">
+        ${steps.map(st => `<div data-go="${st.i}" style="flex:1; min-width:158px; cursor:pointer; display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:11px; background:${st.bg}; border:1px solid ${st.border}; transition:background .3s ease, border-color .3s ease;">
+          <div style="flex:none; width:26px; height:26px; border-radius:7px; display:flex; align-items:center; justify-content:center; background:${st.numBg}; font-size:11px; font-weight:700; color:${st.numFg};">${st.numLabel}</div>
+          <div style="font-size:12px; font-weight:600; color:${st.nameFg}; line-height:1.2;">${st.name}</div>
+        </div>`).join('')}
+      </div>
+      <div style="flex:1; display:flex; flex-direction:column; padding:16px 28px 56px; gap:48px;">
+        <div style="display:flex; align-items:flex-start; gap:16px;">
+          <div style="flex:none; width:6px; align-self:stretch; border-radius:3px; background:#889E82;"></div>
+          <div style="flex:1;">
+            <div style="font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#5A7554; margin-bottom:6px;">Stage ${cur.num} · ${cur.name}</div>
+            <div style="font-size:23px; font-weight:600; letter-spacing:-0.015em; line-height:1.18; margin-bottom:8px; max-width:780px; color:#1E1E1E;">${cur.headline}</div>
+            <div style="font-size:13.5px; color:#5c564e; line-height:1.55; max-width:740px;">${cur.noSplit ? cur.note : cur.note.split(/\. (?=[A-Z])/).map((p,i,a)=>`${p}${i<a.length-1?'.<br>':''}`).join('')}</div>
+          </div>
+          <div style="flex:none; text-align:right; padding-left:12px; min-width:170px;">
+            <div style="font-size:30px; font-weight:700; letter-spacing:-0.02em; color:#1E1E1E; line-height:1; font-variant-numeric:tabular-nums; transition:color .3s ease;">${confirmedCount}<span style="font-size:22px; font-weight:500; color:#a8a29e; letter-spacing:0;">&thinsp;/&thinsp;${SERVICES.length}</span></div>
+            <div style="font-size:10px; color:#78716C; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-top:4px;">services confirmed</div>
+            <div style="margin-top:10px; height:5px; border-radius:99px; background:rgba(30,30,30,0.08); overflow:hidden;"><div style="height:100%; width:${weightedPct}; background:#5A7554; border-radius:99px; transition:width .5s cubic-bezier(.4,0,.2,1);"></div></div>
+            ${processingCount > 0 ? `<div style="font-size:10px; color:#5A7554; font-weight:600; margin-top:6px;">+${processingCount} processing</div>` : ''}
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:minmax(0,35fr) 60px minmax(0,65fr); gap:0; align-items:stretch;">
+          <div style="display:flex; flex-direction:column; gap:10px; min-width:0;">
+            <div style="display:flex; align-items:center; gap:7px;"><span class="ms" style="font-size:16px; color:#78716C;">desktop_windows</span><span style="font-size:10.5px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#78716C;">Front-end · advisor</span></div>
+            ${advisorScreen(state.journey, s)}
+          </div>
+          <div style="position:relative; display:flex; align-items:center; justify-content:center;">
+            <div style="position:absolute; top:28px; bottom:0; left:50%; width:1px; background:rgba(30,30,30,0.12);"></div>
+            <span class="ms" style="position:relative; z-index:1; font-size:26px; color:#889E82; background:#F4EFE7; padding:8px 4px; animation:kzflow 1.6s ease-in-out infinite;">chevron_right</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:10px; min-width:0;">
+            <div style="display:flex; align-items:center; gap:7px;"><span class="ms" style="font-size:16px; color:#78716C;">dns</span><span style="font-size:10.5px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#78716C;">Back-end · Kaluza orchestration</span></div>
+            <div style="flex:1; display:grid; grid-template-columns:1fr 1fr; gap:10px; align-content:start;">
+              ${services.map(serviceNode).join('')}
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+  const footer = `<footer style="display:flex; align-items:center; justify-content:space-between; gap:16px; padding:13px 28px; background:#F9F6F3; border-top:1px solid rgba(30,30,30,0.08);">
+    <button data-act="back" style="display:inline-flex; align-items:center; gap:6px; padding:10px 18px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:600; background:transparent; border:1px solid rgba(30,30,30,0.16); color:${s===0?'#bcb5aa':'#44403C'};"><span class="ms" style="font-size:17px;">arrow_back</span>Back</button>
+    <div style="display:flex; align-items:center; gap:8px;">
+      ${dots.map(d => `<span style="width:${d.w}; height:8px; border-radius:99px; background:${d.bg}; transition:all .3s ease;"></span>`).join('')}
+    </div>
+    <button data-act="next" style="display:inline-flex; align-items:center; gap:7px; padding:10px 20px; border-radius:10px; border:none; cursor:pointer; background:#1E1E1E; color:#EEE8DF; font-size:13px; font-weight:600;">${s>=maxStage()?'Restart demo':'Next stage'}<span class="ms" style="font-size:18px;">${s>=maxStage()?'restart_alt':'arrow_forward'}</span></button>
+  </footer>`;
+
+  document.getElementById('app').innerHTML = header + `<div style="flex:1; display:flex; flex-direction:column; min-height:0;">${body}</div>` + footer;
+
+  document.querySelectorAll('[data-go]').forEach(el => el.addEventListener('click', () => go(+el.dataset.go)));
+  document.querySelectorAll('[data-act]').forEach(el => el.addEventListener('click', () => {
+    const a = el.dataset.act;
+    if (a === 'next') next();
+    else if (a === 'back') back();
+  }));
+  document.querySelectorAll('[data-journey]').forEach(el => el.addEventListener('click', () => setJourney(el.dataset.journey)));
+}
+
+render();
+</script>
+</body>
+</html>
