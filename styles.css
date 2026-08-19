@@ -678,6 +678,7 @@ figcaption.cap .yr { color: var(--muted); }
 .cs-hero-contain { height: 540px; padding: 0 64px; }
 .cs-hero-contain img, .cs-hero-contain .img-placeholder { width: 100%; height: 100%; object-fit: contain; }
 .futuregov-hero { height: 700px; }
+.uscreates-hero { height: 625px; }
 
 .cs-intro { margin: 88px 64px 0; max-width: 680px; font-size: 19px; line-height: 1.6; color: var(--body); }
 
@@ -845,6 +846,7 @@ figcaption.cap .yr { color: var(--muted); }
   .cs-title h1 { font-size: 34px; }
   .cs-hero-contain { height: 280px; }
   .futuregov-hero { height: 360px; }
+  .uscreates-hero { height: 190px; }
   .cs-intro { margin-top: 48px; font-size: 17px; }
   .cs-role-timeline { margin-top: 32px; padding: 28px 0; }
   .cs-pull-stat .num { font-size: 40px; }
