@@ -490,67 +490,6 @@ figcaption.cap .yr { color: var(--muted); }
 .timeline-row .role { display: block; font-family: Newsreader, serif; font-size: 22px; margin-bottom: 8px; }
 .timeline-row .desc { color: var(--body); }
 
-.in-public { padding: 0 64px 88px; }
-.in-public-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 56px 48px;
-  padding-top: 44px;
-}
-.in-public-grid .group-label { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: var(--sage); margin: 0 0 18px; }
-.in-public-grid .entries { display: flex; flex-direction: column; gap: 16px; }
-.in-public-grid .entries p { margin: 0; }
-.in-public-grid .entry-title { font-family: Newsreader, serif; font-size: 19px; }
-.in-public-grid .entry-meta { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: var(--muted); }
-.in-public-grid a.entry-title { text-decoration: none; }
-.in-public-grid .ext { font-size: 12px; vertical-align: 2px; }
-.in-public-grid a.photos-link {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 12.5px;
-  color: var(--sage);
-  border-bottom: 1px solid var(--sage);
-  cursor: pointer;
-}
-
-.in-public-grid details summary {
-  cursor: pointer;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 12.5px;
-  color: var(--sage);
-  list-style: none;
-}
-.in-public-grid details summary::-webkit-details-marker { display: none; }
-.in-public-grid details .press-list { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
-
-.lightbox {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  background: rgba(26,25,23,.82);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-  padding: 48px;
-  cursor: zoom-out;
-}
-.lightbox.open { display: flex; }
-.lightbox > div[data-gallery] { display: flex; gap: 24px; }
-.lightbox img {
-  max-height: 82vh;
-  max-width: 44vw;
-  object-fit: contain;
-  box-shadow: 0 12px 48px rgba(0,0,0,.4);
-}
-.lightbox .close {
-  position: absolute;
-  top: 24px;
-  right: 32px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 13px;
-  color: var(--bg);
-}
-
 /* ==================== PASSWORD GATE ==================== */
 .gate-lock {
   max-width: 480px;
@@ -679,6 +618,7 @@ figcaption.cap .yr { color: var(--muted); }
 .cs-hero-contain img, .cs-hero-contain .img-placeholder { width: 100%; height: 100%; object-fit: contain; }
 .futuregov-hero { height: 700px; }
 .uscreates-hero { height: 625px; }
+.bidean-hero { padding: 0 64px; }
 
 .cs-intro { margin: 88px 64px 0; max-width: 680px; font-size: 19px; line-height: 1.6; color: var(--body); }
 
@@ -780,7 +720,7 @@ figcaption.cap .yr { color: var(--muted); }
 
 @media (max-width: 900px) {
   .hero h1 { font-size: 48px; }
-  .work-grid-2, .cards-grid, .mindnosis-cols, .cs-metarow, .in-public-grid, .logo-grid { grid-template-columns: 1fr 1fr; }
+  .work-grid-2, .cards-grid, .mindnosis-cols, .cs-metarow, .logo-grid { grid-template-columns: 1fr 1fr; }
   .about-intro, .mindnosis-banner, .about-teaser { grid-template-columns: 1fr; }
   .about-intro .about-portrait { width: 100%; height: auto; aspect-ratio: 4/5; object-position: center; }
   .about-teaser .portrait { width: 160px; height: 160px; border-radius: 50%; }
@@ -799,18 +739,18 @@ figcaption.cap .yr { color: var(--muted); }
 @media (max-width: 640px) {
   .site-nav, .hero, .hero-glyphs, .work-section, .work-intro, .services-intro,
   #work-index, .services-cards, .model-rows, .cta-center, .mindnosis-panel,
-  .about-intro, .timeline, .in-public, .logo-wall, .cs-meta-label, .cs-title,
+  .about-intro, .timeline, .logo-wall, .cs-meta-label, .cs-title,
   .cs-metarow, .cs-chapter, .cs-pair, .cs-footer-nav,
   .mindnosis-wrap, .footer-wrap,
-  .cs-hero-contain, .cs-lookback { padding-left: 20px; padding-right: 20px; }
-  .cs-intro, .cs-role-timeline, .cs-collage, .cs-demo {
+  .cs-hero-contain, .cs-lookback, .bidean-hero { padding-left: 20px; padding-right: 20px; }
+  .cs-intro, .cs-role-timeline, .cs-collage, .cs-demo, .cs-stat-strip, .cs-hero-cap {
     margin-left: 20px; margin-right: 20px;
   }
   .site-footer-rule, .rule-flush { margin-left: -20px; margin-right: -20px; }
   .site-nav .signature, .cs-nav .signature { height: 28px; }
   .site-nav nav, .cs-nav-links { gap: 12px; font-size: 11px; }
   .cs-nav { padding-left: 20px; padding-right: 20px; }
-  .work-grid-2, .cards-grid, .mindnosis-cols, .cs-metarow, .in-public-grid, .cs-pair { grid-template-columns: 1fr; }
+  .work-grid-2, .cards-grid, .mindnosis-cols, .cs-metarow, .cs-pair { grid-template-columns: 1fr; }
   .about-teaser { grid-template-columns: 1fr; text-align: left; }
   .model-row, .timeline-row { grid-template-columns: 1fr; gap: 8px; }
   .cs-metarow { grid-template-columns: 1fr 1fr; }
@@ -826,7 +766,7 @@ figcaption.cap .yr { color: var(--muted); }
   .mindnosis-panel .inner { padding: 32px 20px; }
   .mindnosis-banner .panel { padding: 32px 20px; }
   .about-intro { padding: 40px 20px 48px; }
-  .timeline, .in-public { padding-bottom: 48px; }
+  .timeline { padding-bottom: 48px; }
   .about-teaser { margin: 48px 20px 0; padding-top: 32px; }
   .logo-wall { margin-top: 48px; }
   .logo-grid { grid-template-columns: repeat(3, minmax(0,1fr)); gap: 20px; }

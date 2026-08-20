@@ -1,4 +1,4 @@
-// Shared interactions: sticky-nav/footer toggle, work page hover-swap, about lightbox.
+// Shared interactions: sticky-nav/footer toggle, work page hover-swap.
 
 document.addEventListener('DOMContentLoaded', () => {
   // Nav un-sticks while the footer is in view.
@@ -11,39 +11,21 @@ document.addEventListener('DOMContentLoaded', () => {
     io.observe(footer);
   }
 
-  // Work index: hover a row to swap the sticky cover panel + summary.
+  // Work index: hover a row to swap the sticky cover panel, its summary,
+  // and its link destination (each project now has its own page).
   const rows = document.querySelectorAll('[data-work-row]');
   if (rows.length) {
+    const cover = document.getElementById('work-cover');
     const slides = document.querySelectorAll('[data-cover-slide]');
     const summaryEl = document.querySelector('[data-cover-summary]');
+    const hrefs = cover ? JSON.parse(cover.getAttribute('data-hrefs') || '[]') : [];
     rows.forEach((row) => {
       row.addEventListener('mouseenter', () => {
         const i = row.getAttribute('data-work-row');
         slides.forEach((s) => s.classList.toggle('active', s.getAttribute('data-cover-slide') === i));
         if (summaryEl) summaryEl.textContent = row.getAttribute('data-summary') || '';
+        if (cover && hrefs[i]) cover.setAttribute('href', hrefs[i]);
       });
-    });
-  }
-
-  // About page: lightbox galleries.
-  const lightbox = document.querySelector('[data-lightbox]');
-  if (lightbox) {
-    const galleries = lightbox.querySelectorAll('[data-gallery]');
-    const openers = document.querySelectorAll('[data-open-gallery]');
-    const open = (key) => {
-      galleries.forEach((g) => g.style.display = g.getAttribute('data-gallery') === key ? '' : 'none');
-      lightbox.classList.add('open');
-    };
-    const close = () => lightbox.classList.remove('open');
-    openers.forEach((el) => {
-      el.addEventListener('click', (e) => {
-        e.preventDefault();
-        open(el.getAttribute('data-open-gallery'));
-      });
-    });
-    lightbox.addEventListener('click', close);
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') close();
     });
   }
 });
