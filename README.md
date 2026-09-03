@@ -18,33 +18,6 @@ Plain HTML/CSS/JS, no build tools, no frameworks, no dependencies. Hosted on Git
 
 Each standalone page's nav links to the other pages. Nav is sticky, and un-sticks while the footer is in view.
 
-## Password-protected case study (Kaluza only)
-
-`kaluza.html` is gated with a single shared password (currently
-`indigo-lumen-quartz-17` — change it any time, see below). It's client-side
-AES-256-GCM encryption, not real server auth: nothing readable ships in the
-page source until the correct password is entered, but a determined visitor
-could still brute-force it offline. Right for "don't want this openly
-public, but anyone I hand the password to should get straight in" — not for
-anything where a leak would cause real harm. The other three case studies
-(`futuregov.html`, `uscreates.html`, `bidean.html`) are not gated.
-
-**How it works**: the real content lives in `../case-study-content.html`
-(one level up, outside `site/` so it never gets deployed as plaintext).
-`encrypt-gate.py` (same location) encrypts that file with the chosen
-password and prints a `<script type="application/json" id="gate-data">`
-block — paste it into `kaluza.html` in place of the existing one.
-`gate.js` derives a key from whatever the visitor types (PBKDF2) and
-attempts to decrypt; success/failure is exactly whether that matches.
-
-**To change the password or update the case study's content**:
-1. Edit `../case-study-content.html` (plain HTML fragment, no `<html>`/`<head>` wrapper — just what should render inside `#gate-content`).
-2. Run `python3 ../encrypt-gate.py ../case-study-content.html '<new password>'` (needs the `cryptography` pip package).
-3. Replace the `<script id="gate-data">` block in `kaluza.html` with the output.
-4. Tell whoever needs it the new password — there's no way to look the old one up, only to set a new one.
-
-Unlocking is remembered for the browser tab's session (`sessionStorage`) so a reload doesn't ask again, but a new browser session will.
-
 ## Design system
 
 - Fonts: Newsreader (serif, headlines), Karla (body), IBM Plex Mono (nav, labels, captions) — loaded from Google Fonts.
